@@ -6,8 +6,12 @@ from .models import UserProfile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+
     age = serializers.IntegerField(required=True)
     gender = serializers.ChoiceField(choices=UserProfile.GENDER_CHOICES, required=True)
     address = serializers.CharField(max_length=255, required=True)
