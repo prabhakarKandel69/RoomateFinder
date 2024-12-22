@@ -9,9 +9,9 @@ class UserProfile(models.Model):
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    age = models.PositiveIntegerField(null=True, blank=True)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
-    address = models.CharField(max_length=255, null=True, blank=True)
+    age = models.PositiveIntegerField()
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    address = models.CharField(max_length=255)
     smoking_allowed = models.BooleanField(null=True, blank=True)
     pets_allowed = models.BooleanField(null=True, blank=True)
     early_riser = models.BooleanField(null=True, blank=True)
