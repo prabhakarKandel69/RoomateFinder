@@ -4,15 +4,30 @@ from django.contrib.auth.password_validation import validate_password
 
 from .models import UserProfile
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
-    age = serializers.IntegerField(required=False)
-    gender = serializers.ChoiceField(choices=UserProfile.GENDER_CHOICES, required=False)
+    age = serializers.IntegerField(required=True)
+    gender = serializers.ChoiceField(choices=UserProfile.GENDER_CHOICES, required=True)
+    address = serializers.CharField(max_length=255, required=True)
+    smoking_allowed = serializers.BooleanField(required=False)
+    pets_allowed = serializers.BooleanField(required=False)
+    early_riser = serializers.BooleanField(required=False)
+    vegeterian = serializers.BooleanField(required=False)
+    gender_same_prefer = serializers.BooleanField(required=False)
+    introvert = serializers.BooleanField(required=False)
+    min_budget = serializers.IntegerField(required=False)
+    max_budget = serializers.IntegerField(required=False)
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name', 'age', 'gender')
+        fields = (
+            'username', 'password', 'password2', 'email', 'first_name', 'last_name', 
+            'age', 'gender', 'address', 'smoking_allowed', 'pets_allowed', 
+            'early_riser', 'vegeterian', 'gender_same_prefer', 'introvert', 
+            'min_budget', 'max_budget'
+        )
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -20,9 +35,22 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        age = validated_data.pop('age', None)
-        gender = validated_data.pop('gender', None)
+        # Extract fields for User and UserProfile
+        profile_fields = {
+            'age': validated_data.pop('age', None),
+            'gender': validated_data.pop('gender', None),
+            'address': validated_data.pop('address', None),
+            'smoking_allowed': validated_data.pop('smoking_allowed', False),
+            'pets_allowed': validated_data.pop('pets_allowed', False),
+            'early_riser': validated_data.pop('early_riser', False),
+            'vegeterian': validated_data.pop('vegeterian', False),
+            'gender_same_prefer': validated_data.pop('gender_same_prefer', False),
+            'introvert': validated_data.pop('introvert', False),
+            'min_budget': validated_data.pop('min_budget', None),
+            'max_budget': validated_data.pop('max_budget', None),
+        }
 
+        # Create the User object
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
@@ -33,8 +61,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         # Create the UserProfile
-        UserProfile.objects.create(user=user, age=age, gender=gender)
+        UserProfile.objects.create(user=user, **profile_fields)
 
         return user
-
-
