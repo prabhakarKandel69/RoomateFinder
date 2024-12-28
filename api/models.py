@@ -12,6 +12,7 @@ class UserProfile(models.Model):
     age = models.PositiveIntegerField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     address = models.CharField(max_length=255)
+    profile_pic = models.ImageField(upload_to='user/profile_pics/', null=True, blank=True)
     smoking_allowed = models.BooleanField(null=True, blank=True)
     pets_allowed = models.BooleanField(null=True, blank=True)
     early_riser = models.BooleanField(null=True, blank=True)
@@ -20,6 +21,7 @@ class UserProfile(models.Model):
     introvert = models.BooleanField(null=True, blank=True)
     min_budget = models.PositiveIntegerField(null=True, blank=True)
     max_budget = models.PositiveIntegerField(null=True, blank=True)
+    is_looking = models.BooleanField(default=True)
 
 
 

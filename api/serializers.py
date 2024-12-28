@@ -13,6 +13,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=True)
 
     age = serializers.IntegerField(required=True)
+    profile_pic = serializers.ImageField(required=False,allow_null=True)
     gender = serializers.ChoiceField(choices=UserProfile.GENDER_CHOICES, required=True)
     address = serializers.CharField(max_length=255, required=True)
     smoking_allowed = serializers.BooleanField(required=False)
@@ -23,14 +24,15 @@ class RegisterSerializer(serializers.ModelSerializer):
     introvert = serializers.BooleanField(required=False)
     min_budget = serializers.IntegerField(required=False)
     max_budget = serializers.IntegerField(required=False)
+    is_looking = serializers.BooleanField(required=True)
 
     class Meta:
         model = User
         fields = (
-            'username', 'password', 'password2', 'email', 'first_name', 'last_name', 
+            'username', 'password', 'password2', 'email', 'profile_pic','first_name', 'last_name', 
             'age', 'gender', 'address', 'smoking_allowed', 'pets_allowed', 
             'early_riser', 'vegeterian', 'gender_same_prefer', 'introvert', 
-            'min_budget', 'max_budget'
+            'min_budget', 'max_budget', 'is_looking'
         )
 
     def validate(self, attrs):
@@ -52,6 +54,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             'introvert': validated_data.pop('introvert', False),
             'min_budget': validated_data.pop('min_budget', None),
             'max_budget': validated_data.pop('max_budget', None),
+            'profile_pic': validated_data.pop('profile_pic', None),
+            'is_looking': validated_data.pop('is_looking', True),
         }
 
         # Create the User object
@@ -68,3 +72,36 @@ class RegisterSerializer(serializers.ModelSerializer):
         UserProfile.objects.create(user=user, **profile_fields)
 
         return user
+
+from rest_framework import serializers
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'age', 'gender', 'address', 'profile_pic', 'smoking_allowed',
+            'pets_allowed', 'early_riser', 'vegeterian', 'gender_same_prefer',
+            'introvert', 'min_budget', 'max_budget', 'is_looking'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Exclude age, gender, and address from required fields
+        excluded_fields = ['age', 'gender', 'address', 'profile_pic'] 
+        for field_name, field in self.fields.items():
+            if field_name not in excluded_fields:
+                field.required = True
+
+    def validate(self, attrs):
+        # Ensure that min_budget is less than or equal to max_budget
+        min_budget = attrs.get('min_budget')
+        max_budget = attrs.get('max_budget')
+        if min_budget and max_budget and min_budget > max_budget:
+            raise serializers.ValidationError({
+                'min_budget': "Minimum budget cannot be greater than maximum budget."
+            })
+        return attrs
+    
+    
