@@ -72,3 +72,36 @@ class RegisterSerializer(serializers.ModelSerializer):
         UserProfile.objects.create(user=user, **profile_fields)
 
         return user
+
+from rest_framework import serializers
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'age', 'gender', 'address', 'profile_pic', 'smoking_allowed',
+            'pets_allowed', 'early_riser', 'vegeterian', 'gender_same_prefer',
+            'introvert', 'min_budget', 'max_budget', 'is_looking'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Exclude age, gender, and address from required fields
+        excluded_fields = ['age', 'gender', 'address', 'profile_pic'] 
+        for field_name, field in self.fields.items():
+            if field_name not in excluded_fields:
+                field.required = True
+
+    def validate(self, attrs):
+        # Ensure that min_budget is less than or equal to max_budget
+        min_budget = attrs.get('min_budget')
+        max_budget = attrs.get('max_budget')
+        if min_budget and max_budget and min_budget > max_budget:
+            raise serializers.ValidationError({
+                'min_budget': "Minimum budget cannot be greater than maximum budget."
+            })
+        return attrs
+    
+    
