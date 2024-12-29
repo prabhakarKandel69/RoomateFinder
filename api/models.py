@@ -13,20 +13,17 @@ class UserProfile(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     address = models.CharField(max_length=255)
     profile_pic = models.ImageField(upload_to='user/profile_pics/', null=True, blank=True)
-    smoking_allowed = models.BooleanField(null=True, blank=True)
-    pets_allowed = models.BooleanField(null=True, blank=True)
-    early_riser = models.BooleanField(null=True, blank=True)
-    vegeterian = models.BooleanField(null=True, blank=True)
-    gender_same_prefer = models.BooleanField(null=True, blank=True)
-    introvert = models.BooleanField(null=True, blank=True)
-    min_budget = models.PositiveIntegerField(null=True, blank=True)
-    max_budget = models.PositiveIntegerField(null=True, blank=True)
-    is_looking = models.BooleanField(default=True)
+    smoking_allowed = models.BooleanField()
+    pets_allowed = models.BooleanField()
+    early_riser = models.BooleanField()
+    vegeterian = models.BooleanField()
+    gender_same_prefer = models.BooleanField()
+    introvert = models.BooleanField()
+    min_budget = models.PositiveIntegerField()
+    max_budget = models.PositiveIntegerField()
+    is_looking = models.BooleanField()
 
 
 
     def __str__(self):
         return f"{self.user.username}'s profile"
-    
-
-
