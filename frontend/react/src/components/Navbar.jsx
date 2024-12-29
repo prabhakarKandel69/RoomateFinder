@@ -14,13 +14,13 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-md px-6 py-4">
+    <nav className="bg-white shadow-md px-6 py-2">
       <div className="flex justify-around items-center container mx-auto">
         {/* Logo */}
         <Logo />
 
         {/* Hamburger Icon for Mobile */}
-        <div className="lg:hidden">
+        <div className="lg:hidden transform hover:scale-110 transition-transform duration-300">
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="text-gray-800 focus:outline-none"

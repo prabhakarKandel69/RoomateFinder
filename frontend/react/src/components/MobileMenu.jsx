@@ -34,7 +34,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
         <Button
           label="Sign In"
           onClick={() => setIsOpen(false)} // Close menu on button click
-          className="hover:bg-blue-700"
+          className="hover:bg-blue-700 transition-all duration-200"
         />
       </div>
     </div>
