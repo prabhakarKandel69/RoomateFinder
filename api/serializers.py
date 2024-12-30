@@ -4,25 +4,24 @@ from django.contrib.auth.password_validation import validate_password
 
 from .models import UserProfile
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
-    age = serializers.IntegerField(required=False)
-    gender = serializers.ChoiceField(choices=UserProfile.GENDER_CHOICES, required=False)
+    
 
+    
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name', 'age', 'gender')
+        fields = (
+            'username', 'password', 'email','first_name','last_name'
+            )
 
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-        return attrs
+    
 
     def create(self, validated_data):
-        age = validated_data.pop('age', None)
-        gender = validated_data.pop('gender', None)
+        
 
+        # Create the User object
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
@@ -32,9 +31,31 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
 
-        # Create the UserProfile
-        UserProfile.objects.create(user=user, age=age, gender=gender)
-
         return user
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.ImageField(required=False,allow_null=True)
+    
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            'age','gender','address','profile_pic', 'smoking_allowed',
+            'pets_allowed', 'early_riser', 'vegeterian', 'gender_same_prefer',
+            'introvert', 'min_budget', 'max_budget', 'is_looking'
+        )
+
+    
+
+    def validate(self, attrs):
+        # Ensure that min_budget is less than or equal to max_budget
+        min_budget = attrs.get('min_budget')
+        max_budget = attrs.get('max_budget')
+        if min_budget and max_budget and min_budget > max_budget:
+            raise serializers.ValidationError({
+                'min_budget': "Minimum budget cannot be greater than maximum budget."
+            })
+        return attrs
+    
+    
