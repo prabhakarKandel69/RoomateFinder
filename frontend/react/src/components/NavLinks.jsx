@@ -3,7 +3,7 @@ import Icon from './Icon';
 
 const NavLink = ({ href, label, icon, className = '' }) => {
   const defaultClasses =
-    'flex items-center hover:text-blue-500 transition-colors duration-200';
+    'flex items-center hover:underline transition-colors duration-200';
   
   // Custom styles
   const customStyles = {

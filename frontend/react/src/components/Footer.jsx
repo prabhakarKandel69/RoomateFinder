@@ -56,7 +56,7 @@ const Footer = () => {
             <div className="mt-4">
               <a
                 href="/about-us"
-                className="text-blue-600 hover:underline font-medium"
+                className="text-[#243B55] hover:underline font-medium"
               >
                 Learn More About Us
               </a>

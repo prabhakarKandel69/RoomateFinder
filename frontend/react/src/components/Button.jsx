@@ -4,7 +4,7 @@ const Button = ({ label = 'Button', onClick, className = '', type = 'button' }) 
   return (
     <button
       type={type}
-      className={`flex items-center justify-center bg-[#243B55] text-white font-semibold px-5 py-3 rounded-full hover:bg-[#1E40AF] transition duration-300 ${className}`}
+      className={`flex items-center justify-center bg-[#243B55] text-white font-semibold px-5 py-3 rounded-full hover:bg-blue-300 transition duration-300 ${className}`}
       onClick={onClick}
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" className="mr-1">
