@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, LogoutView,ProfileView,PublicProfileView
+from .views import *
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -31,7 +31,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/<str:username>/',PublicProfileView.as_view(),name='public_profile'),
     path('profile/',ProfileView.as_view(),name='profile'),
-    
+    path('delete-account/',DeleteAccountView.as_view(),name='delete-account')
 ]
 
 
