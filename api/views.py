@@ -9,10 +9,34 @@ from .models import UserProfile
 from rest_framework.permissions import IsAuthenticated
 from .serializers import PublicUserProfileSerializer
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from decouple import config
+from django.conf import settings
 
 class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
+
+    def post(self,request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+
+            subject = (
+                "Thank you for choosing our platform!!!!"
+            )
+            message = (
+                f"Hi {user.first_name} thanks for choosing roomatefinder\n\n"
+            )
+
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=None,
+                recipient_list=[user.email]
+            )
+            return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
