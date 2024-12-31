@@ -63,6 +63,18 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self,request):
+        user = request.user
+        try:
+            username = user.username
+            user.delete()
+            return Response({"message":f"Account deleted of {user.username}"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message":e},status=status.HTTP_400_BAD_REQUEST)
+
 
 class PublicProfileView(APIView):
     permission_classes = [AllowAny]
