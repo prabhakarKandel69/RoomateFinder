@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, LogoutView,ProfileView
+from .views import RegisterView, LogoutView,ProfileView,PublicProfileView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -29,7 +29,9 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('profile/<str:username>/',PublicProfileView.as_view(),name='public_profile'),
     path('profile/',ProfileView.as_view(),name='profile'),
+    
 ]
 
 

@@ -7,8 +7,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from .models import UserProfile
 from rest_framework.permissions import IsAuthenticated
-
-
+from .serializers import PublicUserProfileSerializer
+from django.contrib.auth.models import User
 
 class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]
@@ -62,3 +62,17 @@ class ProfileView(APIView):
             serializer.save(profile_pic=profile_pic)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PublicProfileView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, username):
+        try:
+            user = User.objects.get(username=username)
+            profile = user.profile
+            serializer = PublicUserProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except UserProfile.DoesNotExist:
+            return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)

@@ -57,5 +57,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
                 'min_budget': "Minimum budget cannot be greater than maximum budget."
             })
         return attrs
+
+class PublicUserProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source="user.first_name",read_only=True)
+    last_name = serializers.CharField(source="user.last_name",read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ['first_name','last_name','address','profile_pic','min_budget','max_budget']
+
     
     
