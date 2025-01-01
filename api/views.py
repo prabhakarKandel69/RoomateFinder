@@ -32,7 +32,7 @@ class RegisterView(CreateAPIView):
             send_mail(
                 subject=subject,
                 message=message,
-                from_email=None,
+                from_email="team@roomatefinder.com",
                 recipient_list=[user.email]
             )
             return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)

@@ -54,13 +54,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'api.apps.ApiConfig',
-
+     
+    'api.apps.ApiConfig',
+    'chat.apps.ChatConfig',
+    
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'drf_yasg',
+
 
 ]
 
