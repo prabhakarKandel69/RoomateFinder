@@ -1,3 +1,5 @@
+import Card from "../components/Card";
+
 const MatchesSection = () => {
   const matches = [
     { name: "Prabhakar Kandel", description: "A creative enthusiast passionate about tech and new opportunities.", image: "../img/user1.jpg" },
@@ -15,18 +17,8 @@ const MatchesSection = () => {
             key={index}
             className="bg-white shadow-lg rounded-lg overflow-hidden max-w-xs w-full sm:w-auto"
           >
-            <img
-              src={match.image}
-              alt={match.name}
-              className="w-full h-48 sm:h-64 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-bold">{match.name}</h3>
-              <p className="text-gray-600 text-sm mt-2">{match.description}</p>
-              <button className="mt-4 bg-[#243B55] text-white px-4 py-2 rounded w-full">
-                View Profile
-              </button>
-            </div>
+            <Card {...match} />
+            
           </div>
         ))}
       </div>

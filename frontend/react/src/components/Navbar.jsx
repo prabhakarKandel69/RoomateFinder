@@ -57,7 +57,7 @@ const Navbar = ({onSignInClick}) => {
         </div>
       </div>
 
-      <MobileMenu isOpen={isOpen} setIsOpen={setIsOpen} />
+      <MobileMenu isOpen={isOpen} setIsOpen={setIsOpen} onSignInClick={onSignInClick} />
     </nav>
   );
 };
