@@ -6,7 +6,7 @@ import Logo from './logo';
 
 
 
-const MobileMenu = ({ isOpen, setIsOpen }) => {
+const MobileMenu = ({ isOpen, setIsOpen ,onSignInClick}) => {
     const links = [
         { href: '/', label: 'Home', icon: 'home' },
         { href: '/about', label: 'About Us', icon: 'about' },
@@ -33,8 +33,8 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
       <div className="mt-6 px-4">
         <Button
           label="Sign In"
-          onClick={() => setIsOpen(false)} // Close menu on button click
           className="hover:bg-blue-700 transition-all duration-200"
+          onClick={onSignInClick} // Add onClick for navigation
         />
       </div>
     </div>
