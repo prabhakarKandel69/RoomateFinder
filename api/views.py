@@ -7,11 +7,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from .models import UserProfile
 from rest_framework.permissions import IsAuthenticated
-from .serializers import PublicUserProfileSerializer
+from .serializers import *
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from decouple import config
 from django.conf import settings
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class CustomLogin(TokenObtainPairView):
+    serializer_class = CustomLogin
 
 class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]
