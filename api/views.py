@@ -10,8 +10,6 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import *
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
-from decouple import config
-from django.conf import settings
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
@@ -91,6 +89,15 @@ class ProfileView(APIView):
             serializer.save(profile_pic=profile_pic)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self,request):
+        user = request.user
+        profile = request.user.profile
+        try:
+            profile.delete()
+            return Response({"message":f"Profile deleted for {user.username}"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message":e},status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteAccountView(APIView):
     permission_classes = [IsAuthenticated]
@@ -98,7 +105,6 @@ class DeleteAccountView(APIView):
     def delete(self,request):
         user = request.user
         try:
-            username = user.username
             user.delete()
             return Response({"message":f"Account deleted of {user.username}"},status=status.HTTP_200_OK)
         except Exception as e:
