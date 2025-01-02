@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import FormComponent from '../components/FormComponent'; // Reusable Form Component
+import Notification from '../components/Notification'; // Reusable Form Component
+
+
 
 const AuthOverlay = ({ onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState({ message: '', type: '' });
+  const[isbuttonclicked, setIsButtonClicked] = useState(false);
+
 
   // Example: Prefill form if data exists
   // useEffect(() => {
@@ -30,45 +36,74 @@ const AuthOverlay = ({ onClose }) => {
   const handleLoginSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axios.post('/api/login/', data);
-      console.log('Login successful:', response.data);
+      const response = await axios.post('http://127.0.0.1:8000/api/login/', data, {
+        headers: { 'Content-Type': 'application/json' },
+      });
       localStorage.setItem('user', JSON.stringify(response.data));
     } catch (error) {
-      setErrorMessage('Login failed. Please try again.');
+      let errorMsg = 'Login failed. Please try again.';
+      if (error.response?.data) {
+        // Extract error message from the backend response
+        const errors = error.response.data;
+        errorMsg = Object.values(errors).flat().join(' ') || errorMsg;
+      } 
+      setIsButtonClicked(true);
+      setNotification({ message: errorMsg, type: 'error' });
+  
     } finally {
       setIsLoading(false);
     }
   };
 
+  
   const handleRegisterSubmit = async (data) => {
     setIsLoading(true);
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/register/', data, {
         headers: { 'Content-Type': 'application/json' },
       });
-      console.log('Registration successful:', response.data);
-      setIsLogin(true); // Switch to login after successful registration
+      setNotification({ message: 'Registration successful! Please log in.', type: 'success'});
+      
+      setIsLogin(true);
     } catch (error) {
-      setErrorMessage(error.response.data.message || 'Registration failed. Please try again.');
+      let errorMsg = 'Registration failed. Please try again.';
+      if (error.response?.data) {
+        // Extract error message from the backend response
+        const errors = error.response.data;
+        errorMsg = Object.values(errors).flat().join(' ') || errorMsg;
+      } 
+      setIsButtonClicked(true);     
+      setNotification({ message: errorMsg, type: 'error' });
+      
     } finally {
       setIsLoading(false);
     }
   };
 
   const loginFields = [
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email', required: true },
-    { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password', required: true },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email', required: true , validation: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }},
+    { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password', required: true, validation: { minLength: 8 } },
   ];
 
   const registrationFields = [
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email', required: true },
-    { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password', required: true },
-    { name: 'username', label: 'Username', type: 'text', placeholder: 'Enter your username', required: true },
-    { name: 'first_name', label: 'First Name', type: 'text', placeholder: 'Enter your first name', required: true },
-    { name: 'last_name', label: 'Last Name', type: 'text', placeholder: 'Enter your last name', required: true },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email', required: true, validation: {pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, } },
+    { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password', required: true , validation: { minLength: 8,requiresNumeric: true, requiresSpecial: true,  }},
+    { name: 'username', label: 'Username', type: 'text', placeholder: 'Enter your username', required: true , validation: { type: "text" }},
+    { name: 'first_name', label: 'First Name', type: 'text', placeholder: 'Enter your first name', required: true , validation: { type: "text" }},
+    { name: 'last_name', label: 'Last Name', type: 'text', placeholder: 'Enter your last name', required: true, validation: { type: "text" } },
   ];
 
   return (
+    <>
+{isbuttonclicked &&
+    notification && (
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification(null)}
+      />
+    )}
+
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
         {/* Close Button */}
@@ -119,6 +154,7 @@ const AuthOverlay = ({ onClose }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -7,7 +7,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from .models import UserProfile
 from rest_framework.permissions import IsAuthenticated
-
+from drf_yasg.views import get_schema_view
+from drf_yasg.utils import swagger_auto_schema
 
 
 class RegisterView(CreateAPIView):
@@ -36,7 +37,12 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
             return Response({"error": "Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-
+        
+    @swagger_auto_schema(
+        operation_summary="Custom endpoint summary",
+        operation_description="Detailed description of the custom endpoint.",
+        responses={200: "Success", 400: "Bad Request"},
+    )
     def post(self, request):
         if hasattr(request.user, 'profile'):
             return Response({"error": "Profile already exists"}, status=status.HTTP_400_BAD_REQUEST)
