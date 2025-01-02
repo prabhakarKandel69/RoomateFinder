@@ -7,6 +7,7 @@ import AuthOverlay from '../pages/AuthOverlay';
 
 const AppRouter = () => {
   return (
+    
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
