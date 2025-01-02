@@ -37,8 +37,7 @@ def calculate_match_score(user,profile):
 
     total += (normalized_overlap)*weights["budget"]
 
-    return total
-    
+    return total    
     
 
     
@@ -61,12 +60,18 @@ class MatchGetView(APIView):
         matched_profile = []
         matching_profile = UserProfile.objects.all().exclude(user=request.user)
 
+        #for each profile calculating the match score
         for profile in matching_profile:
-            if(calculate_match_score(request.user,profile) > 0.5):
-                print(calculate_match_score(request.user,profile))
-                matched_profile.append(profile)
+            print(calculate_match_score(request.user,profile))
+            matched_profile.append({"profile":profile,"score":calculate_match_score(request.user,profile)})
 
+        #sorting the the dictionary based on score
+        for i in range(len(matched_profile)):
+            for j in range(i,len(matched_profile)):
+                if (matched_profile[j]["score"] > matched_profile[i]["score"]):
+                    matched_profile[j],matched_profile[i] = matched_profile[i],matched_profile[j]
         
+        matched_profile = [matched_profile[i]["profile"] for i in range(len(matched_profile))]
         
 
         response_list = PublicUserProfileSerializer(matched_profile, many=True).data
