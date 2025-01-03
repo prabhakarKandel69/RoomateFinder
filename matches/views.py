@@ -93,9 +93,9 @@ class MatchReqView(APIView):
     def post(self,request):
         requesting_user = request.user
         
-        request_user = request.POST.get('username')
+        request_user = request.POST.get('first_name')
     
-        request_user = User.objects.get(username=request_user)
+        request_user = User.objects.get(first_name=request_user)
 
         try:
             requesting_user_profile = requesting_user.profile
@@ -131,6 +131,43 @@ class MatchRequests(APIView):
 
         match_list = PublicUserProfileSerializer(match_requests, many=True).data
         return Response(match_list, status=status.HTTP_200_OK)
+    
+
+class MatchUser(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PublicUserProfileSerializer
+
+    def post(self,request):
+        try:
+            curr_profile = request.user.profile
+        except UserProfile.DoesNotExist:
+            return Response({"error":"The user doesnot have a profile..."},status=status.HTTP_400_BAD_REQUEST)    
+        
+        try:
+            next_user = User.objects.get(first_name=request.POST.get('first_name'))
+            next_profile = next_user.profile
+        except UserProfile.DoesNotExist:
+            return Response({"error":"The user you are trying to match with doesnot have a profile"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            match = Match.objects.get(user_1=next_profile.user,user_2=curr_profile.user)
+        except Match.DoesNotExist:
+            return Response({"error":"The user trying to create match with didnot request match"},status=status.HTTP_400_BAD_REQUEST)
+        
+        match.matched = True
+        match.save()
+
+        return Response({"Success":"Matched successfully"},status=status.HTTP_200_OK)
+        
+
+
+
+
+
+
+
+
+
 
 
 
