@@ -65,17 +65,12 @@ class MatchGetView(APIView):
         for profile in matching_profile:
             print(calculate_match_score(request.user,profile))
             matched_profile.append({"profile":profile,"score":calculate_match_score(request.user,profile)})
-
-
-
-
-        #sorting the the dictionary based on score
+            
         for i in range(len(matched_profile)):
             for j in range(i,len(matched_profile)):
                 if (matched_profile[j]["score"] > matched_profile[i]["score"]):
                     matched_profile[j],matched_profile[i] = matched_profile[i],matched_profile[j]
 
-        
         
         matched_profile = [matched_profile[i]["profile"] for i in range(len(matched_profile))]
         
