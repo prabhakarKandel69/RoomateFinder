@@ -6,6 +6,7 @@ from api.models import UserProfile
 from api.serializers import PublicUserProfileSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from .models import Match
 
 
 
@@ -65,11 +66,16 @@ class MatchGetView(APIView):
             print(calculate_match_score(request.user,profile))
             matched_profile.append({"profile":profile,"score":calculate_match_score(request.user,profile)})
 
+
+
+
         #sorting the the dictionary based on score
         for i in range(len(matched_profile)):
             for j in range(i,len(matched_profile)):
                 if (matched_profile[j]["score"] > matched_profile[i]["score"]):
                     matched_profile[j],matched_profile[i] = matched_profile[i],matched_profile[j]
+
+        
         
         matched_profile = [matched_profile[i]["profile"] for i in range(len(matched_profile))]
         
@@ -78,6 +84,33 @@ class MatchGetView(APIView):
         
 
         return Response(response_list, status=status.HTTP_200_OK)
+    
+
+class MatchReqView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PublicUserProfileSerializer
+
+    def post(self,request):
+        requesting_user = request.user
+        
+        request_user = request.POST.get('username')
+    
+        request_user = User.objects.get(username=request_user)
+
+        try:
+            requesting_user_profile = requesting_user.profile
+            try:
+                request_user_profile = request_user.profile
+                match = Match(user_1=requesting_user,user_2=request_user)
+                match.save()
+                return Response({"success":f"Sent match request to {request_user.first_name}"},status=status.HTTP_200_OK)
+
+            except UserProfile.DoesNotExist:
+                return Response({"error": "The user you requested doesnt have a profile."}, status=status.HTTP_400_BAD_REQUEST)
+
+        except UserProfile.DoesNotExist:
+            return Response({"error": "Your Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
         
         
         
