@@ -111,7 +111,29 @@ class MatchReqView(APIView):
         except UserProfile.DoesNotExist:
             return Response({"error": "Your Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
+class MatchRequests(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PublicUserProfileSerializer
+
+    def get(self,request):
+        try:
+            profile = request.user.profile
+        except UserProfile.DoesNotExist:
+            return Response({"error":"You don't have a profile"},status=status.HTTP_400_BAD_REQUEST)
         
+        match_requests = Match.objects.filter(user_2=request.user)
+        requesting_profile_list = []
+
+        for match_req in match_requests:
+            requesting_profile_list.append(match_req.user_1.profile)
+        
+        match_requests = requesting_profile_list
+
+        match_list = PublicUserProfileSerializer(match_requests, many=True).data
+        return Response(match_list, status=status.HTTP_200_OK)
+
+
+
         
         
     

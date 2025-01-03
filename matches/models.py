@@ -11,5 +11,3 @@ class Match(models.Model):
     def __str__(self):
         verb = "matched" if self.matched else "requested match"
         return f"{self.user_1} {verb} with {self.user_2}"
-
-    
