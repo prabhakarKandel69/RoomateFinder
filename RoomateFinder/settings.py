@@ -59,6 +59,8 @@ INSTALLED_APPS = [
      'matches.apps.MatchesConfig',
      'chat.apps.ChatConfig',
 
+     'channels',
+
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -67,6 +69,14 @@ INSTALLED_APPS = [
 
 
 ]
+
+ASGI_APPLICATION = 'RoommateFinder.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
