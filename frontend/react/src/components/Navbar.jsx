@@ -1,13 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Logo from './logo';
 import NavLinks from './NavLinks';
 import Button from './Button';
 import MobileMenu from './MobileMenu'; // Import MobileMenu for side navigation
 
-
-const Navbar = ({onSignInClick}) => {
+const Navbar = ({ onSignInClick }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Function to handle window resize and reset mobile menu state
+  const handleResize = () => {
+    if (window.innerWidth >= 1024) {
+      setIsOpen(false); // Hide mobile menu when switching to desktop view
+    }
+  };
+
+  // Add event listener for resize when component mounts
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const links = [
     { href: '#home', label: 'Home' },
@@ -20,6 +35,7 @@ const Navbar = ({onSignInClick}) => {
       <div className="flex justify-around items-center container mx-auto">
         <Logo />
 
+        {/* Mobile Menu Button */}
         <div className="lg:hidden transform hover:scale-110 transition-transform duration-300">
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -44,10 +60,12 @@ const Navbar = ({onSignInClick}) => {
           </button>
         </div>
 
+        {/* Desktop Navbar Links */}
         <div className="hidden lg:flex items-center space-x-6">
           <NavLinks links={links} isMobile={false} />
         </div>
 
+        {/* Desktop Sign In Button */}
         <div className="hidden lg:flex items-center space-x-6">
           <Button
             label="Sign In"
@@ -57,6 +75,7 @@ const Navbar = ({onSignInClick}) => {
         </div>
       </div>
 
+      {/* Mobile Menu Component */}
       <MobileMenu isOpen={isOpen} setIsOpen={setIsOpen} onSignInClick={onSignInClick} />
     </nav>
   );
