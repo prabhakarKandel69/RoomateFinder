@@ -1,10 +1,25 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import UserProfile
 
 
+class CustomLogin(TokenObtainPairSerializer):
+    def validate(self,attrs):
+        username_or_email = attrs.get("username")
+        password = attrs.get("password")
+
+        user = None
+
+        try:
+            user = User.objects.get(email=username_or_email)
+            attrs['username'] = user.username
+        except User.DoesNotExist:
+            pass
+
+        return super().validate(attrs)
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     
@@ -57,5 +72,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
                 'min_budget': "Minimum budget cannot be greater than maximum budget."
             })
         return attrs
+
+class PublicUserProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source="user.first_name",read_only=True)
+    last_name = serializers.CharField(source="user.last_name",read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ['first_name','last_name','address','profile_pic','min_budget','max_budget']
+
     
     
