@@ -35,3 +35,18 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s profile"
+
+class UserPhoto(models.Model):
+    type = [
+        ('P', 'Profile'),
+        ('L', 'Living Spcae'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photos')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    photo = models.ImageField(upload_to='user/photos/')
+    photo_type = models.CharField(max_length=1, choices=type)
+
+
+    def __str__(self):
+        return f"{self.user.username}'s photo of type {self.photo_type}"

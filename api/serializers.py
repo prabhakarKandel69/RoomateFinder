@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import UserProfile
+from .models import UserProfile,UserPhoto
 
 
 class CustomLogin(TokenObtainPairSerializer):
@@ -126,6 +126,12 @@ class PublicUserProfileSerializer(serializers.ModelSerializer):
         if not instance.has_room:
             representation.pop('room_type', None)  # Remove room_type if has_room is False
         return representation
+
+class PhotoSerializer(serializers.ModelSerializer):
+    uploaded_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    class Meta:
+        model = UserPhoto
+        fields = ('photo', 'photo_type','uploaded_at','id')
 
     
     

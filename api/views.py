@@ -13,6 +13,8 @@ from django.core.mail import send_mail
 from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.parsers import MultiPartParser, FormParser
+
 
 
 class CustomLogin(TokenObtainPairView):
@@ -217,3 +219,192 @@ class PublicProfileView(APIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         except UserProfile.DoesNotExist:
             return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class PhotoUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PhotoSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+    @swagger_auto_schema(
+        operation_id='uploadPhoto',
+        operation_description="Upload a photo for the authenticated user. The photo should be provided in the request body.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'photo': openapi.Schema(type=openapi.TYPE_STRING, format='binary', description='The photo file to upload.'),
+                'photo_type': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='The type of the photo. Use "P" for Profile and "L" for Living Space.',
+                    enum=['P', 'L']
+                )
+            },
+            required=['photo', 'photo_type']
+        ),
+        responses={
+            201: openapi.Response(
+                description="Photo uploaded successfully",
+                schema=PhotoSerializer
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message detailing what went wrong.'),
+                        'required_fields': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_STRING), description='List of required fields.'),
+                        'details': openapi.Schema(type=openapi.TYPE_OBJECT, description='Detailed validation errors.')
+                    }
+                )
+            )
+        },
+        tags=['Photo']
+    )
+    def post(self, request, *args, **kwargs):
+        try:
+            profile = request.user.profile
+        except UserProfile.DoesNotExist:
+            return Response({"error": "Profile needs to be there for photo uploads."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            serializer = PhotoSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response({
+                    "error": "Validation failed",
+                    "required_fields": ["photo", "photo_type"],
+                    "details": serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class PhotoGetView(APIView):
+    @swagger_auto_schema(
+        operation_id='getPhotos',
+        operation_description="Retrieve all photos uploaded by the authenticated user.",
+        responses={
+            200: openapi.Response(
+                description="Photos retrieved successfully",
+                schema=PhotoSerializer(many=True)
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Failed to fetch photos.'),
+                    }
+                )
+            )
+        },
+        tags=['Photo']
+    )
+    
+    def get(self, request):
+        try:
+            photos = request.user.photos.all()
+            serializer = PhotoSerializer(photos, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class PhotoDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id='deletePhoto',
+        operation_description="Delete a photo for the authenticated user. The photo ID should be provided in the URL.",
+        responses={
+            200: openapi.Response(
+                description="Photo deleted successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING, description='Success message.')
+                    }
+                )
+            ),
+            404: openapi.Response(
+                description="Photo not found",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message indicating the photo does not exist.')
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message detailing what went wrong.')
+                    }
+                )
+            )
+        },
+        tags=['Photo']
+    )
+    def delete(self, request, photo_id, *args, **kwargs):
+        try:
+            photo = UserPhoto.objects.get(id=photo_id, user=request.user)
+            photo.delete()
+            return Response({"message": "Photo deleted successfully"}, status=status.HTTP_200_OK)
+        except UserPhoto.DoesNotExist:
+            return Response({"error": "Photo does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class PublicPhotoGet(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id='getPublicPhotos',
+        operation_description="Retrieve all photos uploaded by a specified user.",
+        manual_parameters=[
+            openapi.Parameter(
+                'username',
+                openapi.IN_PATH,
+                description="The username of the user whose photos are to be retrieved.",
+                type=openapi.TYPE_STRING,
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Photos retrieved successfully",
+                schema=PhotoSerializer(many=True)
+            ),
+            404: openapi.Response(
+                description="User not found",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message indicating the user does not exist.')
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message detailing what went wrong.')
+                    }
+                )
+            )
+        },
+        tags=['Photo']
+    )
+    def get(self, request, username, *args, **kwargs):
+        try:
+            user = User.objects.get(username=username)
+            photos = user.photos.all()
+            serializer = PhotoSerializer(photos, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
