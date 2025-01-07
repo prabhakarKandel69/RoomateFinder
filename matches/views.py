@@ -12,38 +12,27 @@ from drf_yasg import openapi
 
 
 
-def calculate_match_score(user,profile):
+def calculate_match_score(user, profile):
     
-    fields = ["smoking_allowed", "pets_allowed", "early_riser", "vegeterian", "gender_same_prefer", "introvert"]
+    fields = ["smoking_allowed", "drinking_allowed", "pets_allowed", "early_riser", "vegeterian", "gender_same_prefer", "introvert"]
     
     weights = {
-        "smoking_allowed": 0.25,
-        "pets_allowed": 0.20,
+        "smoking_allowed": 0.20,
+        "drinking_allowed": 0.15,
+        "pets_allowed": 0.15,
         "early_riser": 0.10,
         "vegeterian": 0.05,
         "gender_same_prefer": 0.10,
         "introvert": 0.05,
-        "budget": 0.20,
+        "budget": 0.15,
         "address": 0.05
     }
     curr_profile = user.profile
 
     total = 0
     for field in fields:
-        if (getattr(curr_profile,field) == getattr(profile,field)):
+        if getattr(curr_profile, field) == getattr(profile, field):
             total += weights[field]
-
-
-    #for minimum and maximum budgets calculating overlap
-    overlap = max(0,(min(curr_profile.max_budget,profile.max_budget) - max(curr_profile.min_budget,profile.min_budget)))  
-    normalized_overlap = overlap/(curr_profile.max_budget - curr_profile.min_budget)
-
-    total += (normalized_overlap)*weights["budget"]
-
-    return total    
-    
-
-    
 
 
 class MatchGetView(APIView):

@@ -56,7 +56,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = (
-            'age','gender','address','profile_pic', 'smoking_allowed',
+            'age','gender','address','profile_pic', 'smoking_allowed','drinking_allowed',
             'pets_allowed', 'early_riser', 'vegeterian', 'gender_same_prefer',
             'introvert', 'min_budget', 'max_budget', 'is_looking','has_room','room_type'
         )
