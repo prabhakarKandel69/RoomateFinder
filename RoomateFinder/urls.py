@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('matches/',include('matches.urls')),
     path('chat/',include('chat.urls')),
+    path('search/',include('search.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
