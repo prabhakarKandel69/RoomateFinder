@@ -58,6 +58,7 @@ INSTALLED_APPS = [
      'api.apps.ApiConfig',
      'matches.apps.MatchesConfig',
      'chat.apps.ChatConfig',
+     'search.apps.SearchConfig',
 
      'channels',
 
