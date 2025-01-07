@@ -54,8 +54,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
      'api.apps.ApiConfig',
      'matches.apps.MatchesConfig',
+     'chat.apps.ChatConfig',
+
+     'channels',
 
     'rest_framework',
     'rest_framework_simplejwt',
@@ -63,7 +67,19 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
 
+
 ]
+
+ASGI_APPLICATION = 'RoommateFinder.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
