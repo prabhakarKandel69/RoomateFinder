@@ -194,24 +194,4 @@ class MatchUser(APIView):
         match.save()
 
         return Response({"Success":"Matched successfully"},status=status.HTTP_200_OK)
-        
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        
     
-
-
-
-
-
