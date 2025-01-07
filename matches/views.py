@@ -34,6 +34,17 @@ def calculate_match_score(user, profile):
         if getattr(curr_profile, field) == getattr(profile, field):
             total += weights[field]
 
+    # Assuming budget and address are also part of the calculation
+    if curr_profile.budget == profile.budget:
+        total += weights["budget"]
+    if curr_profile.address == profile.address:
+        total += weights["address"]
+
+    return total
+    
+
+    
+
 
 class MatchGetView(APIView):
     permission_classes = [IsAuthenticated]
