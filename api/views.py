@@ -11,6 +11,8 @@ from .serializers import *
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from rest_framework_simplejwt.views import TokenObtainPairView
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class CustomLogin(TokenObtainPairView):
@@ -56,6 +58,11 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserProfileSerializer
 
+    
+    @swagger_auto_schema(
+        operation_id='get profile of the current authenticated user/all fields',
+    )
+
     def get(self, request):
         try:
             profile = request.user.profile
@@ -64,6 +71,25 @@ class ProfileView(APIView):
         except UserProfile.DoesNotExist:
             return Response({"error": "Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_id='create profile',
+        request_body=UserProfileSerializer,
+        responses={
+            201: openapi.Response(
+                description="Profile created successfully",
+                schema=UserProfileSerializer
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            )
+        }
+    )
     def post(self, request):
         if hasattr(request.user, 'profile'):
             return Response({"error": "Profile already exists"}, status=status.HTTP_400_BAD_REQUEST)
@@ -76,6 +102,26 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_id='update profile',
+        request_body=UserProfileSerializer,
+        responses={
+            200: openapi.Response(
+                description="Profile updated successfully",
+                schema=UserProfileSerializer
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            )
+        }
+        
+    )
     def put(self, request):
         try:
             profile = request.user.profile
@@ -90,6 +136,30 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @swagger_auto_schema(
+            operation_id='delete profile',
+            responses={
+                200: openapi.Response(
+                    description="Profile deleted successfully",
+                    schema=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'message': openapi.Schema(type=openapi.TYPE_STRING)
+                        }
+                    )
+                ),
+                400: openapi.Response(
+                    description="Bad Request",
+                    schema=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'error': openapi.Schema(type=openapi.TYPE_STRING)
+                        }
+                    )
+                )
+            }
+    )
+    
     def delete(self,request):
         user = request.user
         profile = request.user.profile
@@ -101,6 +171,30 @@ class ProfileView(APIView):
 
 class DeleteAccountView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id='delete account',
+        responses={
+            200: openapi.Response(
+                description="Account deleted successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            )
+        }
+    )
 
     def delete(self,request):
         user = request.user

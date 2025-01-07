@@ -7,6 +7,8 @@ from api.serializers import PublicUserProfileSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Match
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 
@@ -47,6 +49,14 @@ def calculate_match_score(user,profile):
 class MatchGetView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PublicUserProfileSerializer
+
+    @swagger_auto_schema(
+        operation_id="get_matches",
+        responses={200: openapi.Response('Success')},
+        operation_description="Get all possible matches for the authenticated user.",
+        reponses={404: openapi.Response('User profile not found.')},
+    )
+
     
     def get(self, request):
         try:
@@ -85,12 +95,25 @@ class MatchReqView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PublicUserProfileSerializer
 
+    @swagger_auto_schema(
+        operation_description="Send a match request to another user.",
+        responses={200: openapi.Response('Success')},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_INTEGER, description='usernamne of the user to which match will be requested'),
+            
+            },
+            required=['username'],
+        ),
+    )
+
     def post(self,request):
         requesting_user = request.user
         
-        request_user = request.POST.get('first_name')
+        request_user = request.POST.get('username')
     
-        request_user = User.objects.get(first_name=request_user)
+        request_user = User.objects.get(username=request_user)
 
         try:
             requesting_user_profile = requesting_user.profile
@@ -98,7 +121,7 @@ class MatchReqView(APIView):
                 request_user_profile = request_user.profile
                 match = Match(user_1=requesting_user,user_2=request_user)
                 match.save()
-                return Response({"success":f"Sent match request to {request_user.first_name}"},status=status.HTTP_200_OK)
+                return Response({"success":f"Sent match request to {request_user.username}"},status=status.HTTP_200_OK)
 
             except UserProfile.DoesNotExist:
                 return Response({"error": "The user you requested doesnt have a profile."}, status=status.HTTP_400_BAD_REQUEST)
@@ -109,6 +132,11 @@ class MatchReqView(APIView):
 class MatchRequests(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PublicUserProfileSerializer
+
+    @swagger_auto_schema(
+    operation_description="Get all match requests received by the authenticated user.",
+    responses={200: openapi.Response('Success')},
+    )
 
     def get(self,request):
         try:
@@ -132,6 +160,19 @@ class MatchUser(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PublicUserProfileSerializer
 
+    @swagger_auto_schema(
+    operation_description="Match with a user who has requested a match.",
+    responses={200: openapi.Response('Success'),
+               
+               },
+               request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_INTEGER, description='username of the user to which match request will be'),
+            
+            },
+            required=['username'],
+        ),)
     def post(self,request):
         try:
             curr_profile = request.user.profile
@@ -139,7 +180,7 @@ class MatchUser(APIView):
             return Response({"error":"The user doesnot have a profile..."},status=status.HTTP_400_BAD_REQUEST)    
         
         try:
-            next_user = User.objects.get(first_name=request.POST.get('first_name'))
+            next_user = User.objects.get(username=request.POST.get('username'))
             next_profile = next_user.profile
         except UserProfile.DoesNotExist:
             return Response({"error":"The user you are trying to match with doesnot have a profile"},status=status.HTTP_400_BAD_REQUEST)
