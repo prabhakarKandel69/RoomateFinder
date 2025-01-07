@@ -25,7 +25,7 @@ const Navbar = ({ onSignInClick }) => {
   }, []);
 
   const links = [
-    { href: '#home', label: 'Home' },
+    { href: '/', label: 'Home' },
     { href: '#about', label: 'About Us' },
     { href: '#contact', label: 'Contact Us' },
   ];

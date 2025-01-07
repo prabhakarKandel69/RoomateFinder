@@ -7,6 +7,7 @@ import FeaturesSection from '../sections/FeaturesSection';
 import AuthOverlay from './AuthOverlay';
 import LocationComponent from '../components/LocationComponent';
 
+
 const LandingPage = () => {
   const [isAuthVisible, setIsAuthVisible] = useState(false);
 
@@ -20,7 +21,7 @@ const LandingPage = () => {
 
   return (
     <>
-    <LocationComponent/>
+    {/* <LocationComponent/> */}
       <Navbar onSignInClick={handleSignInClick} /> {/* Pass the handler */}
       {isAuthVisible && <AuthOverlay onClose={handleCloseAuth} />} {/* Conditionally render */}
       <HeroSection />

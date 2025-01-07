@@ -1,9 +1,18 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
 const HeroSection = () => {
+  const navigate = useNavigate(); // Hook to handle navigation
+
+  const handleInputFocus = () => {
+    navigate("/searchingpage"); // Redirect to the search page on input focus
+  };
+
   return (
     <section
       className="relative bg-cover bg-center h-[800px] flex flex-col justify-center items-center text-white"
       style={{
-        backgroundImage: `url(../img/hero.jpg)`
+        backgroundImage: `url(../img/hero.jpg)`,
       }}
     >
       {/* Black overlay with blur */}
@@ -21,9 +30,14 @@ const HeroSection = () => {
           <input
             type="text"
             placeholder="Search for your ideal roommate"
-            className="px-4 py-2 w-full text-black focus:outline-none"
+            className="px-4 py-2 w-full text-black focus:outline-none bg-primary"
+            onFocus={handleInputFocus} // Navigate to search page when input is focused
           />
-          <button className="bg-[#243B55] px-6 py-2 text-white">Search</button>
+          <button
+            className="bg-[#243B55] px-6 py-2 text-white"
+          >
+            Search
+          </button>
         </div>
       </div>
     </section>
