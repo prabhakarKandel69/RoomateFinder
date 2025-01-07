@@ -7,6 +7,12 @@ class UserProfile(models.Model):
         ('F', 'Female'),
         ('O', 'Other'),
     ]
+    ROOM_TYPE_CHOICES = [
+        ('S', 'Shared'),
+        ('P', 'Private'),
+    ]
+
+    
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     age = models.PositiveIntegerField()
@@ -22,6 +28,8 @@ class UserProfile(models.Model):
     min_budget = models.PositiveIntegerField()
     max_budget = models.PositiveIntegerField()
     is_looking = models.BooleanField()
+    has_room = models.BooleanField(default=False)
+    room_type = models.CharField(max_length=1, choices=ROOM_TYPE_CHOICES, blank=True,null=True)
 
 
 
