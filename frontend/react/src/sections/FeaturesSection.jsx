@@ -11,7 +11,7 @@ const FeaturesSection = ({onSignInClick}) => {
       <section className="py-12 bg-gray-50">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
           {features.map((feature, index) => (
-            <div key={index} className="bg-blue-50 shadow-md rounded-lg p-6 text-center">
+            <div key={index} className="bg-primary shadow-md rounded-lg p-6 text-center">
               <div className="text-4xl mb-4">{feature.icon}</div>
               <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
               <p className="text-gray-600 text-sm">{feature.description}</p>
@@ -19,7 +19,7 @@ const FeaturesSection = ({onSignInClick}) => {
           ))}
         </div>
       </section>
-      <section className="bg-[#243B55] py-16 flex justify-center items-center">
+      <section className="bg-secondary  py-16 flex justify-center items-center">
       <div className="text-center">
         <h2 className="text-blue-50 text-2xl sm:text-3xl font-bold mb-6">
           Ready to Find Your Perfect Partner?
