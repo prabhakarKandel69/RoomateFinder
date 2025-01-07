@@ -11,7 +11,6 @@ from rest_framework.permissions import AllowAny
 
 class Search(APIView):
     permission_classes = [AllowAny]
-   
     serializer_class = PublicUserProfileSerializer
 
     @swagger_auto_schema(
@@ -38,14 +37,20 @@ class Search(APIView):
                 description="List of profiles that match the filters.",
                 schema=PublicUserProfileSerializer(many=True)
             ),
-            400: "Invalid request data.",
+            400: openapi.Response(
+                description="Invalid request data.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description="Error message.")
+                    }
+                )
+            ),
         }
     )
-
     def post(self, request, *args, **kwargs):
         filters = request.data
         queryset = UserProfile.objects.all()
-
 
         if 'age_min' in filters and 'age_max' in filters:
             queryset = queryset.filter(age__gte=filters['age_min'], age__lte=filters['age_max'])
@@ -62,24 +67,20 @@ class Search(APIView):
             queryset = queryset.filter(room_type=filters['room_type'])
 
         if 'preferences' in filters:
-            if 'preferences' in filters:
-                if 'smoking_allowed' in filters['preferences']:
-                    queryset = queryset.filter(smoking_allowed=True)
-                if 'pets_allowed' in filters['preferences']:
-                    queryset = queryset.filter(pets_allowed=True)
-                if 'vegetarian' in filters['preferences']:
-                    queryset = queryset.filter(vegetarian=True)
-                if 'early_riser' in filters['preferences']:
-                    queryset = queryset.filter(early_riser=True)
-                if 'same_gender_prefer' in filters['preferences']:
-                    queryset = queryset
-                if  'introvert' in filters['preferences']:
-                    queryset = queryset.filter(introvert=True)
-                if 'has_room' in filters['preferences']:
-                    queryset = queryset.filter(has_room=True)
-                
-                
-
+            if 'smoking_allowed' in filters['preferences']:
+                queryset = queryset.filter(smoking_allowed=True)
+            if 'pets_allowed' in filters['preferences']:
+                queryset = queryset.filter(pets_allowed=True)
+            if 'vegetarian' in filters['preferences']:
+                queryset = queryset.filter(vegetarian=True)
+            if 'early_riser' in filters['preferences']:
+                queryset = queryset.filter(early_riser=True)
+            if 'same_gender_prefer' in filters['preferences']:
+                queryset = queryset
+            if 'introvert' in filters['preferences']:
+                queryset = queryset.filter(introvert=True)
+            if 'has_room' in filters['preferences']:
+                queryset = queryset.filter(has_room=True)
 
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
