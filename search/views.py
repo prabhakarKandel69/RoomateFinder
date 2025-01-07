@@ -25,8 +25,20 @@ class Search(APIView):
                 'address': openapi.Schema(type=openapi.TYPE_STRING, description="Address to filter by (partial match)."),
                 'preferences': openapi.Schema(
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(type=openapi.TYPE_STRING),
-                    description="List of preferences for filtering (e.g., smoking_allowed, pets_allowed)."
+                    items=openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        enum=[
+                            'smoking_allowed', 
+                            'drinking_allowed', 
+                            'pets_allowed', 
+                            'vegetarian', 
+                            'early_riser', 
+                            'same_gender_prefer', 
+                            'introvert', 
+                            'has_room'
+                        ]
+                    ),
+                    description="List of preferences for filtering. Possible values: smoking_allowed, drinking_allowed, pets_allowed, vegetarian, early_riser, same_gender_prefer, introvert, has_room."
                 ),
             },
             required=[],
@@ -69,6 +81,8 @@ class Search(APIView):
         if 'preferences' in filters:
             if 'smoking_allowed' in filters['preferences']:
                 queryset = queryset.filter(smoking_allowed=True)
+            if 'drinking_allowed' in filters['preferences']:
+                queryset = queryset.filter(drinking_allowed=True)
             if 'pets_allowed' in filters['preferences']:
                 queryset = queryset.filter(pets_allowed=True)
             if 'vegetarian' in filters['preferences']:
