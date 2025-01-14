@@ -2,7 +2,9 @@ import django
 django.setup()
 from django.db.models import Q
 from matches.models import Match
-
+from channels.exceptions import StopConsumer
+import base64
+from RoomateFinder.settings import MEDIA_ROOT
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -70,35 +72,70 @@ class ChatConsumer(AsyncWebsocketConsumer):
         logger.info(f"User {self.user.username} disconnected from {self.room_group_name}")
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data.get("message", "")
+        try:
+            data = json.loads(text_data)
+            message = data.get("message","")
+            attachment = data.get("attachment",None)
 
-        if not message:
-            await self.send(text_data=json.dumps({"error": "Message cannot be empty"}))
-            return
+            if not message and not attachment:
+                await self.send(text_data=json.dumps({
+                    "error": "Message or attachment is required."
+                }))
+                return
+            
+            attachment_path = None
+            if attachment:
+                attachment_path = await database_sync_to_async(self.save_attachment)(attachment)
 
-        logger.info(f"Received message from {self.user.username}: {message}")
-        await database_sync_to_async(self.save_message)(
-            sender=self.user,
-            recipient=self.matching_user_obj,
-            message=message
-        )
+            await database_sync_to_async(self.save_message)(
+                sender=self.user,
+                recipient=self.matching_user_obj,
+                message=message,
+                attachment=attachment_path
+            )
 
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "chat_message",
-                "message": message,
-                "sender": self.user.username,
-            }
-        )
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat_message",
+                    "message": message,
+                    "sender": self.user.username,
+                    "attachment_url": attachment_path
+                }
+            )
+        except Exception as e:
+            logger.error(f"Error in receive: {e}")
+            await self.close()
+    
+    def save_image_attachment(self,base64_data):
+        import uuid
+        import base64
+        from django.core.files.base import ContentFile
 
-    def save_message(self, sender, recipient, message):
+        format, imgstr = base64_data.split(';base64,')
+        ext = format.split('/')[-1]
+
+        allowed_etxensions = ['jpg','jpeg','png']
+        if ext.lower() not in allowed_etxensions:
+            raise ValueError(f"Invalid file extension: {ext}")
+        
+        filename = f"user/attachments/{uuid.uuid4()}.{ext}"
+        file_path = MEDIA_ROOT / filename
+
+        with open(file_path, "wb") as f:
+            f.write(base64.b64decode(imgstr))
+
+        return f"/media/{filename}"
+    
+
+        
+    def save_message(self, sender, recipient, message,attachment):
         from chat.models import Message
         Message.objects.create(
             message_text=message,
             sender=sender,
-            receiver=recipient
+            receiver=recipient,
+            attachment=attachment,
         )
 
     @database_sync_to_async
