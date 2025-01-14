@@ -6,6 +6,10 @@ const MatchesSection = () => {
     { name: "Aakash Raj Jha", description: "An artist with a love for photography and creative storytelling.", image: "../img/user2.jpg" },
     { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
     { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
+    { name: "Prabhakar Kandel", description: "A creative enthusiast passionate about tech and new opportunities.", image: "../img/user1.jpg" },
+    { name: "Aakash Raj Jha", description: "An artist with a love for photography and creative storytelling.", image: "../img/user2.jpg" },
+    { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
+    { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
 
   ];
 
