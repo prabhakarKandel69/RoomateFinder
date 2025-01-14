@@ -35,7 +35,7 @@ const RoommateFilter = () => {
   return (
     <div className="flex flex-col lg:flex-row  bg-[#E7F8FD] p-6">
       {/* Filter Section */}
-      <div className="lg:w-1/4 bg-white p-6 shadow-lg rounded-lg m-5 h-full">
+      <div className="h-[100vh] overflow-auto lg:w-1/4 bg-white p-6 shadow-lg rounded-lg m-5 ">
         <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -195,7 +195,7 @@ const RoommateFilter = () => {
 
       {/* Results Section */}
       <div className="w-full lg:w-3/4 p-3">
-        <div className="h-5/6 overflow-auto bg-[#E7F8FD] rounded-lg p-0 mt-3 hide-scrollbar">
+        <div className="h-[100vh] overflow-auto bg-[#E7F8FD] rounded-lg p-0 mt-3 hide-scrollbar">
           <MatchesSection />
         </div>
       </div>
