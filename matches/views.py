@@ -34,11 +34,10 @@ def calculate_match_score(user, profile):
         if getattr(curr_profile, field) == getattr(profile, field):
             total += weights[field]
 
-    # Assuming budget and address are also part of the calculation
-    if curr_profile.budget == profile.budget:
-        total += weights["budget"]
-    if curr_profile.address == profile.address:
-        total += weights["address"]
+    overlap = max(0, min(curr_profile.max_budget, profile.max_budget) - max(curr_profile.min_budget, profile.min_budget))
+    overlap = overlap / (curr_profile.max_budget - curr_profile.min_budget)
+    total += weights["budget"] * overlap
+    
 
     return total
     
