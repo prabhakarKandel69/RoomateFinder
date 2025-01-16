@@ -23,6 +23,8 @@ class Search(APIView):
                 'min_budget': openapi.Schema(type=openapi.TYPE_INTEGER, description="Minimum budget for filtering."),
                 'max_budget': openapi.Schema(type=openapi.TYPE_INTEGER, description="Maximum budget for filtering."),
                 'address': openapi.Schema(type=openapi.TYPE_STRING, description="Address to filter by (partial match)."),
+                'gender':openapi.Schema(type=openapi.TYPE_STRING,description="Gender of the user to find"),
+                'preferences': openapi.Schema(
                 'preferences': openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Schema(
@@ -77,6 +79,9 @@ class Search(APIView):
 
         if 'room_type' in filters:
             queryset = queryset.filter(room_type=filters['room_type'])
+
+        if 'gender' in filters:
+            queryset = queryset.filter(gender=filters['gender'])
 
         if 'preferences' in filters:
             if 'smoking_allowed' in filters['preferences']:
