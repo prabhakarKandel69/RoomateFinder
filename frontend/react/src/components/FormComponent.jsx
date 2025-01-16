@@ -134,7 +134,7 @@ const FormComponent = ({ fields, onSubmit, buttonText }) => {
             >
               I accept the{" "}
               <a
-                className="font-medium text-[#243B55] hover:underline dark:text-primary-500"
+                className="font-black text-black hover:underline dark:text-secondary"
                 href="#"
               >
                 Terms and Conditions

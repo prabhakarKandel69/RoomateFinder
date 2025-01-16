@@ -224,3 +224,4 @@ class MatchedView(APIView):
 
         match_list = PublicUserProfileSerializer(matches, many=True).data
         return Response(match_list, status=status.HTTP_200_OK)
+

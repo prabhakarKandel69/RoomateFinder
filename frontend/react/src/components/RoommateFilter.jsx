@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { Range } from "react-range";
 import MatchesSection from "../sections/MatchesSection";
 
 const RoommateFilter = () => {
+  const [matches, setMatches] = useState([]); // Initialize matches as an empty array
+
   const [filters, setFilters] = useState({
     gender: "",
     smoking_allowed: false,
@@ -17,6 +20,7 @@ const RoommateFilter = () => {
     room_type: "",
   });
 
+
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
     setFilters({
@@ -26,11 +30,54 @@ const RoommateFilter = () => {
   };
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const filterValues = JSON.stringify(filters, null, 2);
-    alert(`Filters applied:\n${filterValues}`);
+  
+    // Transform filters for backend format
+    const transformedFilters = {
+      age_min: filters.age_range[0],
+      age_max: filters.age_range[1],
+      min_budget: filters.min_budget[0],
+      max_budget: filters.min_budget[1],
+      address: "Sanepa", // Replace this with an address field if available
+      preferences: Object.keys(filters)
+        .filter((key) => filters[key] === true) // Add boolean keys with true values
+    };
+  
+    try {
+      const response = await fetch("http://127.0.0.1:8000/search/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transformedFilters),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        alert("Filters applied successfully!");
+        // console.log("Matches received:", result.matches); // Log result matches directly
+        setMatches(result); // The backend response is the array of matches itself
+      } else {
+        console.error("Error:", response.statusText);
+        alert("Failed to apply filters.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while applying filters.");
+    }
   };
+
+ // UseEffect to show the latest matches in the alert
+ useEffect(() => {
+  if (Array.isArray(matches) && matches.length > 0) { // Ensure matches is an array
+    alert("Matches found: " + JSON.stringify(matches)); // Show matches in alert when updated
+  }
+}, [matches]); // Trigger the effect whenever 'matches' changes
+
+
+  
+  
 
   return (
     <div className="flex flex-col lg:flex-row  bg-[#E7F8FD] p-6">
@@ -196,7 +243,7 @@ const RoommateFilter = () => {
       {/* Results Section */}
       <div className="w-full lg:w-3/4 p-3">
         <div className="h-[100vh] overflow-auto bg-[#E7F8FD] rounded-lg p-0 mt-3 hide-scrollbar">
-          <MatchesSection />
+        <MatchesSection matches={matches} /> {/* Pass matches as prop */}
         </div>
       </div>
     </div>

@@ -1,36 +1,29 @@
+import React from "react";
 import Card from "../components/Card";
 
-const MatchesSection = () => {
-  const matches = [
-    { name: "Prabhakar Kandel", description: "A creative enthusiast passionate about tech and new opportunities.", image: "../img/user1.jpg" },
-    { name: "Aakash Raj Jha", description: "An artist with a love for photography and creative storytelling.", image: "../img/user2.jpg" },
-    { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
-    { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
-    { name: "Prabhakar Kandel", description: "A creative enthusiast passionate about tech and new opportunities.", image: "../img/user1.jpg" },
-    { name: "Aakash Raj Jha", description: "An artist with a love for photography and creative storytelling.", image: "../img/user2.jpg" },
-    { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
-    { name: "Anita Jha", description: "A graduate seeking a mindful and peaceful living space.", image: "../img/user3.jpg" },
-
-  ];
-
+const MatchesSection = ({ matches = [] }) => {
   return (
-    <>
-    <section className="py-12 bg-[#E7F8FD] ">
-      {/* <h2 className="text-2xl font-bold text-center mb-8">Best Matches For You</h2> */}
+    <section className="py-12 bg-[#E7F8FD]">
       <div className="flex flex-wrap justify-center gap-4">
-        {matches.map((match, index) => (
-          <div
-            key={index}
-            className="bg-white shadow-lg rounded-lg overflow-hidden max-w-xs w-full sm:w-auto"
-          >
-            <Card {...match} />
-            
+        {matches.length > 0 ? (
+          matches.map((match, index) => (
+            <Card
+              key={index}
+              username={match.username}
+              address={match.address}
+              profile_pic={match.profile_pic}
+              min_budget={match.min_budget}
+              max_budget={match.max_budget}
+            />
+          ))
+        ) : (
+          <div className="text-gray-500 text-center w-full py-10">
+            <p className="text-lg text-red-600">No Matches Found</p>
+            <p className="text-sm">Try adjusting the filters to find roommates.</p>
           </div>
-        ))}
+        )}
       </div>
     </section>
- 
-    </>
   );
 };
 
