@@ -24,21 +24,21 @@ const Dsnavbar = ({ active }) => {
           label="Dashboard"
           icon={<span className="mr-2">👤</span>}
           isActive={activeButton === 'Dashboard'}
-          className="w-full mb-2  rounded-lg "
+          className="w-full mb-2 px-5 py-3 rounded-lg "
           onClick={() => handleNavigation('Dashboard', '/dashboard')}
         />
         <Button
           label="Messages"
           icon={<span className="mr-2">💬</span>}
           isActive={activeButton === 'Messages'}
-          className="w-full mb-2  rounded-lg"
+          className="w-full mb-2 px-5 py-3 rounded-lg"
           onClick={() => handleNavigation('Messages', '/messages')}
         />
         <Button
           label="Settings"
           icon={<span className="mr-2">⚙️</span>}
           isActive={activeButton === 'Settings'}
-          className="w-full  rounded-lg"
+          className="w-full px-5 py-3 rounded-lg"
           onClick={() => handleNavigation('Settings', '/settings')}
         />
       </div>
@@ -48,7 +48,7 @@ const Dsnavbar = ({ active }) => {
         label="Log Out"
         icon={<span className="mr-2">↩️</span>}
         isActive={activeButton === 'Log Out'}
-        className="w-full rounded-lg"
+        className="w-full px-5 py-3 rounded-lg"
         onClick={() => {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');

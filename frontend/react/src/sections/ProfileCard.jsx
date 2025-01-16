@@ -12,7 +12,7 @@ const ProfileCard = ({ userData }) => {
     drinking_allowed: "Drinker",
     early_riser: "Early Riser",
     introvert: "Introvert",
-    is_looking: "Looking for Roommate",
+    is_looking: "",
   };
 
   // Filter keys with true values
@@ -29,7 +29,7 @@ const ProfileCard = ({ userData }) => {
       <img
         src={profilePic}
         alt={`${userData.name || "User"}'s profile picture`}
-        className="w-1/3 h-1/3 rounded-lg object-cover"
+        className="w-32 h-32 rounded-lg object-cover"
       />
 
       {/* Profile Details */}
@@ -37,12 +37,12 @@ const ProfileCard = ({ userData }) => {
         <div className="flex flex-col md:flex-row items-center justify-between">
           {/* Name and Age */}
           <h2 className="text-xl font-bold text-gray-800">
-            {userData.name || "Aakash Raj Jha"}, {userData.age || 24}
+            {userData.first_name || "Aakash Raj Jha"} {userData.last_name}, {userData.age || 24}
           </h2>
           {/* Status Badge */}
-          <span className="px-3 py-1 text-sm font-medium text-white bg-secondary rounded-lg mt-2 md:mt-0">
+          {/* <span className="px-3 py-1 text-sm font-medium text-white bg-secondary rounded-lg mt-2 md:mt-0">
             {userData.is_looking ? "Looking For Roommate" : "Not Looking"}
-          </span>
+          </span> */}
         </div>
 
         {/* Location */}
