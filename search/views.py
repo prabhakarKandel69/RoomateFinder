@@ -25,7 +25,6 @@ class Search(APIView):
                 'address': openapi.Schema(type=openapi.TYPE_STRING, description="Address to filter by (partial match)."),
                 'gender':openapi.Schema(type=openapi.TYPE_STRING,description="Gender of the user to find"),
                 'preferences': openapi.Schema(
-                'preferences': openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Schema(
                         type=openapi.TYPE_STRING,
