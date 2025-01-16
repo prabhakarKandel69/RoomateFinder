@@ -11,43 +11,63 @@ const AuthRedirect = ({ children }) => {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
-        navigate('/home'); // Redirect to login if no refresh token is available
-        return;
+        throw new Error('No refresh token available');
       }
 
       const response = await axios.post(
         'http://127.0.0.1:8000/api/token/refresh/', // Refresh token endpoint
-        { refresh_token: refreshToken }
+        { refresh: refreshToken } // Ensure the key matches your backend implementation
       );
 
-      const { access_token } = response.data;
-      localStorage.setItem('accessToken', access_token); // Store new access token
-      return access_token;
+      const { access } = response.data;
+      localStorage.setItem('accessToken', access); // Store the new access token
+      return access;
     } catch (err) {
-      console.error("Error refreshing token", err);
+      console.error('Error refreshing token:', err);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      navigate('/home'); // Redirect to login if refresh token is invalid
       return null;
     }
   };
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
+    const checkAuthentication = async () => {
+      const accessToken = localStorage.getItem('accessToken');
 
-    if (!accessToken) {
-      setLoading(false);
-      navigate('/home'); // Redirect to login if no access token
-    } else {
-      setLoading(false);
-      navigate('/dashboard'); // Redirect to dashboard if access token is available
-    }
+      if (!accessToken) {
+        // Attempt to refresh the token if no access token is found
+        const newAccessToken = await refreshAccessToken();
+        if (!newAccessToken) {
+          setLoading(false);
+          navigate('/home'); // Redirect to login if refresh fails
+          return;
+        }
+      }
+
+      // Validate the token or use it directly
+      try {
+        await axios.get('http://127.0.0.1:8000/api/profile/', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+        });
+        setLoading(false); // Token is valid
+      } catch (err) {
+        console.error('Error validating token:', err);
+        const newAccessToken = await refreshAccessToken();
+        if (!newAccessToken) {
+          setLoading(false);
+          navigate('/home'); // Redirect to login if refresh fails
+        } else {
+          setLoading(false); // Token refreshed successfully
+        }
+      }
+    };
+
+    checkAuthentication();
   }, [navigate]);
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
-      {!loading  && children} {/* Render the page's children */}
+      {loading ? <p>Loading...</p> : children}
     </div>
   );
 };

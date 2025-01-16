@@ -6,6 +6,8 @@ import Dsnavbar from '../components/Dsnavbar';
 import ProfileCard from '../sections/ProfileCard';
 import Suggestions from '../sections/Suggestions';
 import AuthRedirect from '../components/AuthRedirect';
+import DashboardCards from '../sections/DashboardCards';
+import DashboardLists from '../sections/DashboardLists';
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -55,11 +57,33 @@ const Dashboard = () => {
             {loading && <p>Loading...</p>} {/* Show loading state */}
             {error && <p className="text-red-500">{error}</p>} {/* Show error message */}
             {userData && !loading && !error && <ProfileCard userData={userData} />} {/* Render ProfileCard only when data is available */}
+            <div >
+              <DashboardCards />
+            </div>
+            <div>
+              <DashboardLists />
+            </div>
+
+
           </div>
 
-          <div className="m-8">
-            <Suggestions />
+          <div className="w-full h-[100vh] md:w-1/5 bg-white flex flex-col p-0 m-8 rounded-lg shadow-lg overflow-auto hide-scrollbar">
+            {/* Header Section */}
+            <div className="w-full flex flex-col items-center sticky top-0 bg-secondary z-10">
+            <hr className="my-2 w-full border-gray-300" />
+              <h1 className="  text-2xl r font-semibold font-inter text-white  px-4  rounded-md">
+                Suggestions
+              </h1>
+              <hr className="my-2 w-full border-gray-300" />
+            </div>
+
+            {/* Suggestions Content */}
+            <div className="flex-1">
+              <Suggestions />
+            </div>
           </div>
+
+
         </div>
       </div>
       </AuthRedirect>
