@@ -80,6 +80,11 @@ class MatchGetView(APIView):
                 if (matched_profile[j]["score"] > matched_profile[i]["score"]):
                     matched_profile[j],matched_profile[i] = matched_profile[i],matched_profile[j]
 
+
+        
+        for i in range(len(matched_profile)):
+            print(matched_profile[i]["score"])
+
         
         matched_profile = [matched_profile[i]["profile"] for i in range(len(matched_profile))]
         
@@ -193,4 +198,30 @@ class MatchUser(APIView):
         match.save()
 
         return Response({"Success":"Matched successfully"},status=status.HTTP_200_OK)
-    
+
+
+class MatchedView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PublicUserProfileSerializer
+
+    @swagger_auto_schema(
+    operation_description="Get all matched users for the authenticated user.",
+    responses={200: openapi.Response('Success')},
+    )
+    def get(self,request):
+        try:
+            profile = request.user.profile
+        except UserProfile.DoesNotExist:
+            return Response({"error":"You don't have a profile"},status=status.HTTP_400_BAD_REQUEST)
+        
+        matches = Match.objects.filter(user_1=request.user,matched=True)
+        matched_profile_list = []
+
+        for match in matches:
+            matched_profile_list.append(match.user_2.profile)
+        
+        matches = matched_profile_list
+
+        match_list = PublicUserProfileSerializer(matches, many=True).data
+        return Response(match_list, status=status.HTTP_200_OK)
+
