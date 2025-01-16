@@ -6,6 +6,7 @@ import MatchesSection from '../sections/MatchesSection';
 import FeaturesSection from '../sections/FeaturesSection';
 import AuthOverlay from './AuthOverlay';
 import LocationComponent from '../components/LocationComponent';
+import AuthRedirect from '../components/AuthRedirect';
 
 
 const LandingPage = () => {
@@ -21,13 +22,15 @@ const LandingPage = () => {
 
   return (
     <>
+    <AuthRedirect>
     {/* <LocationComponent/> */}
       <Navbar onSignInClick={handleSignInClick} /> {/* Pass the handler */}
       {isAuthVisible && <AuthOverlay onClose={handleCloseAuth} />} {/* Conditionally render */}
       <HeroSection />
-      <MatchesSection />
+      {/* <MatchesSection /> */}
       <FeaturesSection onSignInClick={handleSignInClick} />
       <Footer />
+      </AuthRedirect>
     </>
   );
 };
