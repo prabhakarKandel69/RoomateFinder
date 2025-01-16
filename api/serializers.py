@@ -90,11 +90,13 @@ class PublicUserProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)
+    email = serializers.CharField(source="user.email", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
 
     class Meta:
         model = UserProfile
         fields = [
-            'username', 'first_name', 'last_name', 
+            'username', 'user_id', 'first_name', 'last_name', 'email',
             'address', 'profile_pic', 'min_budget', 
             'max_budget', 'has_room', 'room_type'
         ]
