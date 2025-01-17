@@ -7,6 +7,7 @@ from api.serializers import PublicUserProfileSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
 
 
 class Search(APIView):
@@ -102,3 +103,53 @@ class Search(APIView):
 
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SearchByName(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = PublicUserProfileSerializer
+
+    @swagger_auto_schema(
+        operation_description="Search user profiles by name.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'name': openapi.Schema(type=openapi.TYPE_STRING, description="Name to search for (partial match)."),
+            },
+            required=['name'],
+            description="Provide the name to search for."
+        ),
+        responses={
+            200: openapi.Response(
+                description="List of profiles that match the name.",
+                schema=PublicUserProfileSerializer(many=True)
+            ),
+            400: openapi.Response(
+                description="Invalid request data.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description="Error message.")
+                    }
+                )
+            ),
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        if 'name' not in data:
+            return Response({'error': 'The name field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        name = data['name']
+        queryset = User.objects.filter(
+            Q(first_name__icontains=name) | 
+            Q(last_name__icontains=name) | 
+            Q(username__icontains=name)
+        )
+
+        user_ids = queryset.values_list('id', flat=True)
+        queryset = UserProfile.objects.filter(user_id__in=user_ids)
+
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
