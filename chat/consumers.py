@@ -169,11 +169,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
     def save_message(self, sender, recipient, message,attachment):
         from chat.models import Message
+        from notifications.models import Notification
         Message.objects.create(
             message_text=message,
             sender=sender,
             receiver=recipient,
             attachment=attachment,
+        )
+
+        Notification.objects.create(
+            user1 = sender,
+            user2 = recipient,
+            notification_action = 'messaged'
         )
 
     @database_sync_to_async
