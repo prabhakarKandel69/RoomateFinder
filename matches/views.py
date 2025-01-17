@@ -126,6 +126,7 @@ class MatchReqView(APIView):
                 request_user_profile = request_user.profile
                 match = Match(user_1=requesting_user,user_2=request_user)
                 match.save()
+                Notification.objects.create(user1=requesting_user,user2=request_user,notification_action='matchrequest')
                 return Response({"success":f"Sent match request to {request_user.username}"},status=status.HTTP_200_OK)
 
             except UserProfile.DoesNotExist:
@@ -197,7 +198,7 @@ class MatchUser(APIView):
         
         match.matched = True
         match.save()
-        Notification.objects.create(user1=curr_profile.user,user2=next_profile.user,notification_action='M')
+        Notification.objects.create(user1=curr_profile.user,user2=next_profile.user,notification_action='matched')
 
         return Response({"Success":"Matched successfully"},status=status.HTTP_200_OK)
 
