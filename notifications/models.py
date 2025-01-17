@@ -15,4 +15,7 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'{self.user1.username} {self.notification_action} {self.user2.username}'
+
+    class Meta:
+        ordering = ['-time']
     
