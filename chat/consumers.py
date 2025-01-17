@@ -2,7 +2,9 @@ import django
 django.setup()
 from django.db.models import Q
 from matches.models import Match
-
+from channels.exceptions import StopConsumer
+import base64
+from RoomateFinder.settings import MEDIA_ROOT
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -70,35 +72,108 @@ class ChatConsumer(AsyncWebsocketConsumer):
         logger.info(f"User {self.user.username} disconnected from {self.room_group_name}")
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data.get("message", "")
+        try:
+            data = json.loads(text_data)
+            message = data.get("message", "")
+            attachment = data.get("attachment", None)
 
-        if not message:
-            await self.send(text_data=json.dumps({"error": "Message cannot be empty"}))
-            return
+            # Log attachment data to check its format
+            logger.info(f"Received attachment: {attachment}")
 
-        logger.info(f"Received message from {self.user.username}: {message}")
-        await database_sync_to_async(self.save_message)(
-            sender=self.user,
-            recipient=self.matching_user_obj,
-            message=message
-        )
+            if not message and not attachment:
+                await self.send(text_data=json.dumps({
+                    "error": "Message or attachment is required."
+                }))
+                return
 
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "chat_message",
-                "message": message,
-                "sender": self.user.username,
-            }
-        )
+            attachment_path = None
+            if attachment:
+                # If attachment exists, process the base64 image
+                attachment_path = await database_sync_to_async(self.save_image_attachment)(attachment)
 
-    def save_message(self, sender, recipient, message):
+            await database_sync_to_async(self.save_message)(
+                sender=self.user,
+                recipient=self.matching_user_obj,
+                message=message,
+                attachment=attachment_path
+            )
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat_message",
+                    "message": message,
+                    "sender": self.user.username,
+                    "attachment_url": attachment_path,  # Ensure this is the correct path
+                }
+            )
+        except Exception as e:
+            logger.error(f"Error in receive: {e}")
+            await self.close()
+
+    
+    
+
+    def save_image_attachment(self, base64_data):
+
+        from pathlib import Path
+        import uuid
+        import base64
+        from django.core.files.base import ContentFile
+
+        try:
+            # Split Base64 string and decode
+            header, imgstr = base64_data.split(';base64,')
+            img_data = base64.b64decode(imgstr)
+        except (ValueError, base64.binascii.Error) as e:
+            logger.error(f"Base64 decoding failed: {e}")
+            raise ValueError("Invalid Base64 image data.")
+
+        # Extract extension from header
+        ext = header.split('/')[1].lower()
+        allowed_extensions = ['jpg', 'jpeg', 'png']
+        if ext not in allowed_extensions:
+            logger.error(f"Unsupported file extension: {ext}")
+            raise ValueError("Unsupported image format.")
+
+        # Generate file name and path
+        filename = f"user/attachments/{uuid.uuid4()}.{ext}"
+        file_path = Path(MEDIA_ROOT) / filename
+
+        # Ensure parent directory exists
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            # Save the file
+            with open(file_path, "wb") as f:
+                f.write(img_data)
+        except Exception as e:
+            logger.error(f"File saving failed: {e}")
+            raise ValueError("Error saving image file.")
+
+        # Confirm the file exists
+        if not file_path.exists():
+            logger.error(f"File saving failed: {file_path}")
+            raise ValueError("File saving failed.")
+
+        # Return the relative media URL
+        return f"/media/{filename}"
+
+
+            
+
+
+
+    
+
+        
+    def save_message(self, sender, recipient, message,attachment):
         from chat.models import Message
         Message.objects.create(
             message_text=message,
             sender=sender,
-            receiver=recipient
+            receiver=recipient,
+            attachment=attachment,
         )
 
     @database_sync_to_async
@@ -111,11 +186,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event["message"]
         sender = event["sender"]
+        attachment_url = event.get("attachment_url")  # Fetch the attachment URL
 
-        logger.info(f"Broadcasting message: {message} from {sender} in room {self.room_group_name}")
+        logger.info(f"Broadcasting message: {message} from {sender} with attachment: {attachment_url}")
 
         if self.user.username != sender:
             await self.send(text_data=json.dumps({
                 "message": message,
                 "sender": sender,
+                "attachment_url": attachment_url,  # Include in response
             }))
+

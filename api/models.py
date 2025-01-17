@@ -20,6 +20,7 @@ class UserProfile(models.Model):
     address = models.CharField(max_length=255)
     profile_pic = models.ImageField(upload_to='user/profile_pics/', null=True, blank=True)
     smoking_allowed = models.BooleanField()
+    drinking_allowed = models.BooleanField()
     pets_allowed = models.BooleanField()
     early_riser = models.BooleanField()
     vegeterian = models.BooleanField()

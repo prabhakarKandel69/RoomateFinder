@@ -51,14 +51,19 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     profile_pic = serializers.ImageField(required=False,allow_null=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    last_name = serializers.CharField(source="user.last_name", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
     
 
     class Meta:
         model = UserProfile
         fields = (
-            'age','gender','address','profile_pic', 'smoking_allowed',
+            'age','gender','address','first_name','last_name','profile_pic', 'smoking_allowed','drinking_allowed',
             'pets_allowed', 'early_riser', 'vegeterian', 'gender_same_prefer',
-            'introvert', 'min_budget', 'max_budget', 'is_looking','has_room','room_type'
+            'introvert', 'min_budget', 'max_budget', 'is_looking','has_room','room_type','user_id','username','email'
         )
 
     
@@ -90,11 +95,13 @@ class PublicUserProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)
+    email = serializers.CharField(source="user.email", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
 
     class Meta:
         model = UserProfile
         fields = [
-            'username', 'first_name', 'last_name', 
+            'username', 'user_id', 'first_name', 'last_name', 'email',
             'address', 'profile_pic', 'min_budget', 
             'max_budget', 'has_room', 'room_type'
         ]
