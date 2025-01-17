@@ -60,11 +60,9 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserProfileSerializer
 
-    
     @swagger_auto_schema(
         operation_id='get profile of the current authenticated user/all fields',
     )
-
     def get(self, request):
         try:
             profile = request.user.profile
@@ -104,13 +102,64 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#     @swagger_auto_schema(
+#     operation_id='update profile',
+#     manual_parameters=[
+#         openapi.Parameter(
+#             'profile_pic',
+#             openapi.IN_FORM,
+#             description="Upload a profile picture",
+#             type=openapi.TYPE_FILE
+#         )
+#     ],
+#     responses={
+#         200: openapi.Response(
+#             description="Profile updated successfully",
+#             schema=UserProfileSerializer
+#         ),
+#         400: openapi.Response(
+#             description="Bad Request",
+#             schema=openapi.Schema(
+#                 type=openapi.TYPE_OBJECT,
+#                 properties={
+#                     'error': openapi.Schema(type=openapi.TYPE_STRING)
+#                 }
+#             )
+#         )
+#     }
+# )
+    def put(self, request):
+        try:
+            # Retrieve the current user's profile
+            profile = request.user.profile
+        except UserProfile.DoesNotExist:
+            return Response({"error": "Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Extract the profile_pic separately from FILES
+        profile_pic = request.FILES.get('profile_pic')
+
+        # Use data from the request to update the profile
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            # Save the profile, including an optional profile picture
+            serializer.save(profile_pic=profile_pic)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Return validation errors
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
     @swagger_auto_schema(
-        operation_id='update profile',
-        request_body=UserProfileSerializer,
+        operation_id='delete profile',
         responses={
             200: openapi.Response(
-                description="Profile updated successfully",
-                schema=UserProfileSerializer
+                description="Profile deleted successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
             ),
             400: openapi.Response(
                 description="Bad Request",
@@ -122,54 +171,15 @@ class ProfileView(APIView):
                 )
             )
         }
-        
     )
-    def put(self, request):
-        try:
-            profile = request.user.profile
-        except UserProfile.DoesNotExist:
-            return Response({"error": "Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = UserProfileSerializer(profile, data=request.data, partial=True)
-        if serializer.is_valid():
-            profile_pic = request.FILES.get('profile_pic')
-            # Update the profile with or without a new profile picture
-            serializer.save(profile_pic=profile_pic)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    @swagger_auto_schema(
-            operation_id='delete profile',
-            responses={
-                200: openapi.Response(
-                    description="Profile deleted successfully",
-                    schema=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'message': openapi.Schema(type=openapi.TYPE_STRING)
-                        }
-                    )
-                ),
-                400: openapi.Response(
-                    description="Bad Request",
-                    schema=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'error': openapi.Schema(type=openapi.TYPE_STRING)
-                        }
-                    )
-                )
-            }
-    )
-    
-    def delete(self,request):
+    def delete(self, request):
         user = request.user
         profile = request.user.profile
         try:
             profile.delete()
-            return Response({"message":f"Profile deleted for {user.username}"},status=status.HTTP_200_OK)
+            return Response({"message": f"Profile deleted for {user.username}"}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"message":e},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteAccountView(APIView):
     permission_classes = [IsAuthenticated]

@@ -3,6 +3,9 @@ import Logo from './logo';
 import NavLinks from './NavLinks';
 import Button from './Button';
 import MobileMenu from './MobileMenu'; // Import MobileMenu for side navigation
+import Icon from './Icon';
+
+
 
 const Navbar = ({ onSignInClick }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -69,7 +72,8 @@ const Navbar = ({ onSignInClick }) => {
         <div className="hidden lg:flex items-center space-x-6">
           <Button
             label="Sign In"
-            className="hover:bg-green-700"
+            className="hover:bg-green-700 text-white bg-secondary px-5 py-3"
+            icon={<Icon name="login" className="w-10 h-10 mr-1" />}
             onClick={onSignInClick} // Add onClick for navigation
           />
         </div>

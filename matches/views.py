@@ -13,35 +13,34 @@ from notifications.models import Notification
 
 
 
-def calculate_match_score(user,profile):
+def calculate_match_score(user, profile):
     
-    fields = ["smoking_allowed", "pets_allowed", "early_riser", "vegeterian", "gender_same_prefer", "introvert"]
+    fields = ["smoking_allowed", "drinking_allowed", "pets_allowed", "early_riser", "vegeterian", "gender_same_prefer", "introvert"]
     
     weights = {
-        "smoking_allowed": 0.25,
-        "pets_allowed": 0.20,
+        "smoking_allowed": 0.20,
+        "drinking_allowed": 0.15,
+        "pets_allowed": 0.15,
         "early_riser": 0.10,
         "vegeterian": 0.05,
         "gender_same_prefer": 0.10,
         "introvert": 0.05,
-        "budget": 0.20,
+        "budget": 0.15,
         "address": 0.05
     }
     curr_profile = user.profile
 
     total = 0
     for field in fields:
-        if (getattr(curr_profile,field) == getattr(profile,field)):
+        if getattr(curr_profile, field) == getattr(profile, field):
             total += weights[field]
 
+    overlap = max(0, min(curr_profile.max_budget, profile.max_budget) - max(curr_profile.min_budget, profile.min_budget))
+    overlap = overlap / (curr_profile.max_budget - curr_profile.min_budget)
+    total += weights["budget"] * overlap
+    
 
-    #for minimum and maximum budgets calculating overlap
-    overlap = max(0,(min(curr_profile.max_budget,profile.max_budget) - max(curr_profile.min_budget,profile.min_budget)))  
-    normalized_overlap = overlap/(curr_profile.max_budget - curr_profile.min_budget)
-
-    total += (normalized_overlap)*weights["budget"]
-
-    return total    
+    return total
     
 
     
@@ -81,6 +80,11 @@ class MatchGetView(APIView):
             for j in range(i,len(matched_profile)):
                 if (matched_profile[j]["score"] > matched_profile[i]["score"]):
                     matched_profile[j],matched_profile[i] = matched_profile[i],matched_profile[j]
+
+
+        
+        for i in range(len(matched_profile)):
+            print(matched_profile[i]["score"])
 
         
         matched_profile = [matched_profile[i]["profile"] for i in range(len(matched_profile))]
@@ -196,4 +200,30 @@ class MatchUser(APIView):
         Notification.objects.create(user1=curr_profile.user,user2=next_profile.user,notification_action='M')
 
         return Response({"Success":"Matched successfully"},status=status.HTTP_200_OK)
-    
+
+
+class MatchedView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PublicUserProfileSerializer
+
+    @swagger_auto_schema(
+    operation_description="Get all matched users for the authenticated user.",
+    responses={200: openapi.Response('Success')},
+    )
+    def get(self,request):
+        try:
+            profile = request.user.profile
+        except UserProfile.DoesNotExist:
+            return Response({"error":"You don't have a profile"},status=status.HTTP_400_BAD_REQUEST)
+        
+        matches = Match.objects.filter(user_1=request.user,matched=True)
+        matched_profile_list = []
+
+        for match in matches:
+            matched_profile_list.append(match.user_2.profile)
+        
+        matches = matched_profile_list
+
+        match_list = PublicUserProfileSerializer(matches, many=True).data
+        return Response(match_list, status=status.HTTP_200_OK)
+

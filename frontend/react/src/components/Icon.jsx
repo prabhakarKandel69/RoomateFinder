@@ -52,6 +52,39 @@ const Icon = ({ name, className = 'w-5 h-5' }) => {
         />
       </svg>
     ),
+    notification: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+        className={className}
+      >
+        <path
+          d="M256 73.825c-100.613 0-182.18 81.562-182.18 182.17a182.18 182.18 0 0 0 364.36 0c0-100.608-81.572-182.17-182.18-182.17zm0 282.92a23.683 23.683 0 0 1-23.682-23.678h47.36A23.68 23.68 0 0 1 256 356.745zm80.015-47.425c0 8.753-7.092 9.334-15.841 9.334H191.822c-8.749 0-15.837-.58-15.837-9.334v-1.512a15.814 15.814 0 0 1 9.009-14.247l5.03-43.418a66.01 66.01 0 0 1 52.41-64.591v-16.857a13.572 13.572 0 0 1 27.146 0v16.857a66.01 66.01 0 0 1 52.404 64.591l5.032 43.427a15.793 15.793 0 0 1 9.009 14.238v1.512z"
+        />
+      </svg>
+    ),
+    login: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" className="mr-1">
+        <g fill="none" stroke="currentColor">
+          <path strokeLinejoin="round" d="M4 18a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" />
+          <circle cx="12" cy="7" r="3" />
+        </g>
+      </svg> 
+    ),
+    menu: (
+      <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"  viewBox="0 0 50 50" className={className}>
+      <path d="M 5 8 A 2.0002 2.0002 0 1 0 5 12 L 45 12 A 2.0002 2.0002 0 1 0 45 8 L 5 8 z M 5 23 A 2.0002 2.0002 0 1 0 5 27 L 45 27 A 2.0002 2.0002 0 1 0 45 23 L 5 23 z M 5 38 A 2.0002 2.0002 0 1 0 5 42 L 45 42 A 2.0002 2.0002 0 1 0 45 38 L 5 38 z"></path>
+      </svg>
+    ),
+    location: (
+     
+          <img
+            src="../img/location.svg"
+            alt="location"
+            className={className}
+          />
+      
+    ),
   };
 
   return icons[name] || null;
