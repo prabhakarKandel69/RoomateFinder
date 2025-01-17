@@ -7,6 +7,7 @@ from api.serializers import PublicUserProfileSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
 
 
 class Search(APIView):
@@ -90,20 +91,18 @@ class SearchByName(APIView):
     serializer_class = PublicUserProfileSerializer
 
     @swagger_auto_schema(
-        operation_description="Search user profiles based on the given name or username.",
+        operation_description="Search user profiles by name.",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'first_name': openapi.Schema(type=openapi.TYPE_STRING, description="First name of the user."),
-                'last_name': openapi.Schema(type=openapi.TYPE_STRING, description="Last name of the user."),
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description="Username of the user."),
+                'name': openapi.Schema(type=openapi.TYPE_STRING, description="Name to search for (partial match)."),
             },
-            required=['first_name', 'last_name', 'username'],
-            description="Provide at least one of the first name, last name, or username of the user to search."
+            required=['name'],
+            description="Provide the name to search for."
         ),
         responses={
             200: openapi.Response(
-                description="List of profiles that match the given name or username.",
+                description="List of profiles that match the name.",
                 schema=PublicUserProfileSerializer(many=True)
             ),
             400: openapi.Response(
@@ -119,18 +118,18 @@ class SearchByName(APIView):
     )
     def post(self, request, *args, **kwargs):
         data = request.data
+        if 'name' not in data:
+            return Response({'error': 'The name field is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not any(key in data for key in ['first_name', 'last_name', 'username']):
-            return Response({'error': 'At least one of first_name, last_name, or username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        name = data['name']
+        queryset = User.objects.filter(
+            Q(first_name__icontains=name) | 
+            Q(last_name__icontains=name) | 
+            Q(username__icontains=name)
+        )
 
-        queryset = UserProfile.objects.all()
-
-        if 'first_name' in data:
-            queryset = queryset.filter(user__first_name__icontains=data['first_name'])
-        if 'last_name' in data:
-            queryset = queryset.filter(user__last_name__icontains=data['last_name'])
-        if 'username' in data:
-            queryset = queryset.filter(user__username__icontains=data['username'])
+        user_ids = queryset.values_list('id', flat=True)
+        queryset = UserProfile.objects.filter(user_id__in=user_ids)
 
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
