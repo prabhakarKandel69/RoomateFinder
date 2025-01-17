@@ -84,3 +84,53 @@ class Search(APIView):
 
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class SearchByName(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = PublicUserProfileSerializer
+
+    @swagger_auto_schema(
+        operation_description="Search user profiles based on the given name or username.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'first_name': openapi.Schema(type=openapi.TYPE_STRING, description="First name of the user."),
+                'last_name': openapi.Schema(type=openapi.TYPE_STRING, description="Last name of the user."),
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description="Username of the user."),
+            },
+            required=['first_name', 'last_name', 'username'],
+            description="Provide at least one of the first name, last name, or username of the user to search."
+        ),
+        responses={
+            200: openapi.Response(
+                description="List of profiles that match the given name or username.",
+                schema=PublicUserProfileSerializer(many=True)
+            ),
+            400: openapi.Response(
+                description="Invalid request data.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description="Error message.")
+                    }
+                )
+            ),
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        data = request.data
+
+        if not any(key in data for key in ['first_name', 'last_name', 'username']):
+            return Response({'error': 'At least one of first_name, last_name, or username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        queryset = UserProfile.objects.all()
+
+        if 'first_name' in data:
+            queryset = queryset.filter(user__first_name__icontains=data['first_name'])
+        if 'last_name' in data:
+            queryset = queryset.filter(user__last_name__icontains=data['last_name'])
+        if 'username' in data:
+            queryset = queryset.filter(user__username__icontains=data['username'])
+
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
