@@ -90,32 +90,32 @@ class SearchByName(APIView):
     permission_classes = [AllowAny]
     serializer_class = PublicUserProfileSerializer
 
-    @swagger_auto_schema(
-        operation_description="Search user profiles by name.",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'name': openapi.Schema(type=openapi.TYPE_STRING, description="Name to search for (partial match)."),
-            },
-            required=['name'],
-            description="Provide the name to search for."
-        ),
-        responses={
-            200: openapi.Response(
-                description="List of profiles that match the name.",
-                schema=PublicUserProfileSerializer(many=True)
-            ),
-            400: openapi.Response(
-                description="Invalid request data.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'error': openapi.Schema(type=openapi.TYPE_STRING, description="Error message.")
-                    }
-                )
-            ),
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="Search user profiles by name.",
+    #     request_body=openapi.Schema(
+    #         type=openapi.TYPE_OBJECT,
+    #         properties={
+    #             'name': openapi.Schema(type=openapi.TYPE_STRING, description="Name to search for (partial match)."),
+    #         },
+    #         required=['name'],
+    #         description="Provide the name to search for."
+    #     ),
+    #     responses={
+    #         200: openapi.Response(
+    #             description="List of profiles that match the name.",
+    #             schema=PublicUserProfileSerializer(many=True)
+    #         ),
+    #         400: openapi.Response(
+    #             description="Invalid request data.",
+    #             schema=openapi.Schema(
+    #                 type=openapi.TYPE_OBJECT,
+    #                 properties={
+    #                     'error': openapi.Schema(type=openapi.TYPE_STRING, description="Error message.")
+    #                 }
+    #             )
+    #         ),
+    #     }
+    # )
     def post(self, request, *args, **kwargs):
         data = request.data
         if 'name' not in data:

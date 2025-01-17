@@ -28,6 +28,7 @@ class UserProfile(models.Model):
     min_budget = models.PositiveIntegerField()
     max_budget = models.PositiveIntegerField()
     is_looking = models.BooleanField()
+    drinking_allowed = models.BooleanField(default=False)
 
     has_room = models.BooleanField(default=False)
     room_type = models.CharField(max_length=1, choices=ROOM_TYPE_CHOICES, blank=True,null=True)

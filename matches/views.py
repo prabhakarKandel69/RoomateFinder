@@ -9,6 +9,7 @@ from rest_framework import status
 from .models import Match
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from notifications.models import Notification
 
 
 
@@ -192,6 +193,7 @@ class MatchUser(APIView):
         
         match.matched = True
         match.save()
+        Notification.objects.create(user1=curr_profile.user,user2=next_profile.user,notification_action='M')
 
         return Response({"Success":"Matched successfully"},status=status.HTTP_200_OK)
     
