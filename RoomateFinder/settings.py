@@ -59,6 +59,7 @@ INSTALLED_APPS = [
      'matches.apps.MatchesConfig',
      'chat.apps.ChatConfig',
      'search.apps.SearchConfig',
+     'notifications.apps.NotificationsConfig',
 
      'channels',
 

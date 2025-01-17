@@ -136,9 +136,12 @@ class PublicUserProfileSerializer(serializers.ModelSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     uploaded_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
+
     class Meta:
         model = UserPhoto
-        fields = ('photo', 'photo_type','uploaded_at','id')
+        fields = ('photo', 'photo_type','uploaded_at','id','username','user_id')
 
     
     

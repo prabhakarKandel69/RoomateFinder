@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
-from .serializers import RegisterSerializer,UserProfileSerializer
+from .serializers import RegisterSerializer, UserProfileSerializer, PhotoSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from .models import UserProfile
@@ -235,40 +235,30 @@ class PhotoUploadView(APIView):
     serializer_class = PhotoSerializer
     parser_classes = [MultiPartParser, FormParser]
 
-    # @swagger_auto_schema(
-    #     operation_id='uploadPhoto',
-    #     operation_description="Upload a photo for the authenticated user. The photo should be provided in the request body.",
-    #     request_body=openapi.Schema(
-    #         type=openapi.TYPE_OBJECT,
-    #         properties={
-    #             'photo': openapi.Schema(type=openapi.TYPE_STRING, format='binary', description='The photo file to upload.'),
-    #             'photo_type': openapi.Schema(
-    #                 type=openapi.TYPE_STRING,
-    #                 description='The type of the photo. Use "P" for Profile and "L" for Living Space.',
-    #                 enum=['P', 'L']
-    #             )
-    #         },
-    #         required=['photo', 'photo_type']
-    #     ),
-    #     responses={
-    #         201: openapi.Response(
-    #             description="Photo uploaded successfully",
-    #             schema=PhotoSerializer
-    #         ),
-    #         400: openapi.Response(
-    #             description="Bad Request",
-    #             schema=openapi.Schema(
-    #                 type=openapi.TYPE_OBJECT,
-    #                 properties={
-    #                     'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message detailing what went wrong.'),
-    #                     'required_fields': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_STRING), description='List of required fields.'),
-    #                     'details': openapi.Schema(type=openapi.TYPE_OBJECT, description='Detailed validation errors.')
-    #                 }
-    #             )
-    #         )
-    #     },
-    #     tags=['Photo']
-    # )
+    @swagger_auto_schema(
+    operation_id='uploadPhoto',
+    operation_description="Upload a photo for the authenticated user.",
+    request_body=PhotoSerializer,
+    responses={
+        201: openapi.Response(
+            description="Photo uploaded successfully",
+            schema=PhotoSerializer
+        ),
+        400: openapi.Response(
+            description="Bad Request",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message detailing what went wrong.'),
+                    'required_fields': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_STRING)),
+                    'details': openapi.Schema(type=openapi.TYPE_OBJECT)
+                }
+            )
+        )
+    },
+    tags=['Photo']
+)
+
     def post(self, request, *args, **kwargs):
         try:
             profile = request.user.profile
