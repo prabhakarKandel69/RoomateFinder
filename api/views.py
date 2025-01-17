@@ -102,32 +102,25 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     @swagger_auto_schema(
-#     operation_id='update profile',
-#     manual_parameters=[
-#         openapi.Parameter(
-#             'profile_pic',
-#             openapi.IN_FORM,
-#             description="Upload a profile picture",
-#             type=openapi.TYPE_FILE
-#         )
-#     ],
-#     responses={
-#         200: openapi.Response(
-#             description="Profile updated successfully",
-#             schema=UserProfileSerializer
-#         ),
-#         400: openapi.Response(
-#             description="Bad Request",
-#             schema=openapi.Schema(
-#                 type=openapi.TYPE_OBJECT,
-#                 properties={
-#                     'error': openapi.Schema(type=openapi.TYPE_STRING)
-#                 }
-#             )
-#         )
-#     }
-# )
+    @swagger_auto_schema(
+        operation_id='update profile',
+        request_body=UserProfileSerializer,
+        responses={
+            200: openapi.Response(
+                description="Profile updated successfully",
+                schema=UserProfileSerializer
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            )
+        }
+    )
     def put(self, request):
         try:
             # Retrieve the current user's profile
