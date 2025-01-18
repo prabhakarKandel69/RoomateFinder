@@ -7,7 +7,7 @@ const Card = ({ username, address, profile_pic, min_budget, max_budget }) => {
       <img
         src={`http://127.0.0.1:8000${profile_pic}`}
         alt={username || "User"}
-        className="w-full h-48 sm:h-64 object-cover"
+        className="w-80 h-48 sm:h-64 object-cover"
       />
       
       {/* Profile Details */}

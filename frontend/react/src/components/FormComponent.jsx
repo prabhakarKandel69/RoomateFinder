@@ -66,6 +66,7 @@ const FormComponent = ({ fields, onSubmit, buttonText }) => {
   const isFormValid = !Object.values(errors).some((error) => error !== "");
 
   return (
+    
     <form onSubmit={handleSubmit} className="space-y-4">
       {fields.map((field) => (
         <div key={field.name} className="flex flex-col">

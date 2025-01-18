@@ -33,7 +33,7 @@ const MobileMenu = ({ isOpen, setIsOpen ,onSignInClick}) => {
       <div className="mt-6 px-4">
         <Button
           label="Sign In"
-          className="hover:bg-blue-700 transition-all duration-200"
+          className="hover:bg-blue-700 transition-all duration-200 bg-secondary text-white px-5 py-3"
           onClick={onSignInClick} // Add onClick for navigation
         />
       </div>
