@@ -10,6 +10,7 @@ const MatchesSection = ({ matches = [] }) => {
             <Card
               key={index}
               username={match.username}
+              // {match.desc}
               address={match.address}
               profile_pic={match.profile_pic}
               min_budget={match.min_budget}

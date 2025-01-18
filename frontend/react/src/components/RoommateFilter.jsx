@@ -7,7 +7,7 @@ const RoommateFilter = () => {
   const [matches, setMatches] = useState([]); // Initialize matches as an empty array
 
   const [filters, setFilters] = useState({
-    gender: "",
+    gender: null,
     smoking_allowed: false,
     drinking_allowed: false,
     pets_allowed: false,
@@ -17,7 +17,7 @@ const RoommateFilter = () => {
     introvert: false,
     min_budget: [0, 15000], // Initial range for budget
     age_range: [18, 30], // Initial range for age
-    room_type: "",
+    room_type: null,
   });
 
 
@@ -39,7 +39,7 @@ const RoommateFilter = () => {
       age_max: filters.age_range[1],
       min_budget: filters.min_budget[0],
       max_budget: filters.min_budget[1],
-      address: "Sanepa", // Replace this with an address field if available
+      // address: null, // Replace this with an address field if available
       preferences: Object.keys(filters)
         .filter((key) => filters[key] === true) // Add boolean keys with true values
     };

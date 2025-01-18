@@ -23,11 +23,11 @@ const DashboardCards = () => {
   ];
 
   return (
-    <div className="flex  justify-center gap-6  p-0">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
       {cards.map((card, index) => (
         <div
           key={index}
-          className="w-60 bg-white rounded-lg shadow-md p-4 flex flex-col"
+          className="bg-white rounded-lg shadow-md p-4 flex flex-col"
         >
           <div className="flex justify-between items-center">
             <h2 className="text-secondary font-bold font-inter">{card.title}</h2>

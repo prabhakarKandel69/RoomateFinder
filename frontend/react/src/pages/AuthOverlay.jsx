@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import axios from 'axios';
 import FormComponent from '../components/FormComponent';
 import Notification from '../components/Notification';
@@ -8,7 +7,6 @@ import Notification from '../components/Notification';
 const AuthOverlay = ({ onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [notification, setNotification] = useState({ message: '', type: '' });
   const [formKey, setFormKey] = useState(Date.now()); // Key to reset form
   const navigate = useNavigate();  // Initialize the navigate function
 
@@ -16,33 +14,58 @@ const AuthOverlay = ({ onClose }) => {
 
   const handleToggle = () => {
     setIsLogin(!isLogin);
-    setNotification({ message: '', type: '' }); // Clear any notifications
     setFormKey(Date.now()); // Reset form
   };
 
   const handleLoginSubmit = async (data) => {
-
     try {
       setLoading(true);
-
+  
+      // Make the login request
       const response = await axios.post(`${apiUrl}/api/login/`, data, {
         headers: { 'Content-Type': 'application/json' },
       });
-      setNotification({ message: 'Login successful', type: 'success' });
-      localStorage.setItem('accessToken', response.data.access); // Store access token
-      localStorage.setItem('refreshToken', response.data.refresh); // Store refresh token
-      navigate('/dashboard');
-
-      setFormKey(Date.now()); // Reset form after success
+  
+      // Store access and refresh tokens
+      localStorage.setItem('accessToken', response.data.access);
+      localStorage.setItem('refreshToken', response.data.refresh);
+  
+      // Check if the profile exists by sending a GET request to the profile endpoint
+      const profileResponse = await axios.get('http://127.0.0.1:8000/api/profile/', {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${response.data.access}`,
+        },
+      });
+  
+      // Check if profile has an id
+      if (profileResponse.data.user_id) {
+        // If the id exists, navigate to the dashboard
+        navigate('/dashboard');
+        Notification("Login successful", "success");
+        return
+      } 
+  
     } catch (error) {
+      // Handle error for login or profile
       const errorMsg = error.response?.data
         ? Object.values(error.response.data).flat().join(' ')
         : 'Login failed. Please try again.';
-      setNotification({ message: errorMsg, type: 'error' });
+        if(error.response.data) {
+          // If the id is null or falsy, navigate to profile creation
+          navigate('/profile-creation');
+          Notification("Please complete your profile creation", "success");
+          return
+        }
+  
+      // Show error notification
+      Notification(`❌ ${errorMsg}`, "error");
+  
       setLoading(false);
-
     }
   };
+  
+  
 
   const handleRegisterSubmit = async (data) => {
     
@@ -51,7 +74,8 @@ const AuthOverlay = ({ onClose }) => {
       const response = await axios.post(`${apiUrl}/api/register/`, data, {
         headers: { 'Content-Type': 'application/json' },
       });
-      setNotification({ message: 'Registration successful! Please log in.', type: 'success' });
+      Notification("Registration successful! Please log in ", "success")
+
       setIsLogin(true);
       setFormKey(Date.now()); // Reset form after success
       setLoading(false);
@@ -60,9 +84,12 @@ const AuthOverlay = ({ onClose }) => {
         ? Object.values(error.response.data).flat().join(' ')
         : 'Registration failed. Please try again.';
         setLoading(false);
-      setNotification({ message: errorMsg, type: 'error' });
+        Notification(`❌ ${errorMsg}`, "error");
+
     }
   };
+  
+
 
   const loginFields = [
     { name: 'username', label: 'Username', type: 'text', placeholder: 'Enter your username', required: true },
@@ -78,15 +105,10 @@ const AuthOverlay = ({ onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      {notification.message && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          onClose={() => setNotification({ message: '', type: '' })}
-        />
-      )}
-      <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-6">
+      {/* Display Notification if there's any message */}
+     
+      <div className="relative bg-primary rounded-lg shadow-lg p-6 w-full max-w-md">
         <button
           type="button"
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 focus:outline-none"
@@ -103,8 +125,7 @@ const AuthOverlay = ({ onClose }) => {
           key={formKey}
           fields={isLogin ? loginFields : registrationFields}
           onSubmit={isLogin ? handleLoginSubmit : handleRegisterSubmit}
-          buttonText={ loading ? 'Loading...' : isLogin ? 'Login' : 'Register'
-      }
+          buttonText={loading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
         />
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">

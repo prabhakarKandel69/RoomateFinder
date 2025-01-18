@@ -1,34 +1,28 @@
-import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Notification = ({ message, type, onClose }) => {
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setVisible(false);
-      if (onClose) {
-        onClose();
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer); // Cleanup the timer when the component unmounts
-  }, [onClose]);
-
-  if (!visible) return null;
-
-  return (
-    <div
-      className={`fixed top-4 inset-x-4 sm:inset-x-auto sm:right-4 max-w-full sm:max-w-sm px-4 py-2 rounded shadow-lg z-[100] ${
-        type === "success"
-          ? "bg-green-500 text-white"
-          : "bg-red-500 text-white"
-      }`}
-    >
-      <div className="flex justify-between items-center">
-        <span className="text-sm sm:text-base">{message}</span>
-      </div>
-    </div>
-  );
+const Notification = (message, type = "success") => {
+  if (message) {
+    if (type === "success") {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 2000, // 2 seconds
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } else {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  }
 };
 
 export default Notification;
