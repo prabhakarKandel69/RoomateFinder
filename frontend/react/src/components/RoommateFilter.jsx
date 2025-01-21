@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { Range } from "react-range";
 import MatchesSection from "../sections/MatchesSection";
+import { handleSearch } from "../utils/Searchfunction";
+import SearchBar from '../components/SearchBar';
+
 
 const RoommateFilter = () => {
   const [matches, setMatches] = useState([]); // Initialize matches as an empty array
@@ -76,10 +79,14 @@ const RoommateFilter = () => {
 }, [matches]); // Trigger the effect whenever 'matches' changes
 
 
+
+
   
   
 
   return (
+    <>
+    <SearchBar onSearch={handleSearch} />
     <div className="flex flex-col lg:flex-row  bg-[#E7F8FD] p-6">
       {/* Filter Section */}
       <div className="h-[100vh] overflow-auto lg:w-1/4 bg-white p-6 shadow-lg rounded-lg m-5 ">
@@ -239,14 +246,17 @@ const RoommateFilter = () => {
           </button>
         </form>
       </div>
+      
 
       {/* Results Section */}
       <div className="w-full lg:w-3/4 p-3">
+      
         <div className="h-[100vh] overflow-auto bg-[#E7F8FD] rounded-lg p-0 mt-3 hide-scrollbar">
         <MatchesSection matches={matches} /> {/* Pass matches as prop */}
         </div>
       </div>
     </div>
+    </>
   );
 };
 

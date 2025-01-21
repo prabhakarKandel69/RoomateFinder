@@ -85,6 +85,15 @@ const Icon = ({ name, className = 'w-5 h-5' }) => {
           />
       
     ),
+    request: (
+                
+                  <img
+                    src="../img/request.svg"
+                    alt="location"
+                    className={className}
+                  />
+              
+            ),
   };
 
   return icons[name] || null;

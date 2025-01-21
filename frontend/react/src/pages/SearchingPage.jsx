@@ -48,7 +48,7 @@ const SearchingPage = () => {
 
       </div>
     </section> */}
-     <SearchBar onSearch={handleSearch} />
+     
 
 
     <RoommateFilter/>

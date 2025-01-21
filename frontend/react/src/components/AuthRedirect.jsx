@@ -67,7 +67,7 @@ const AuthRedirect = ({ children }) => {
 
   return (
     <div>
-      {loading ? <p>Loading...</p> : children}
+      { children}
     </div>
   );
 };
