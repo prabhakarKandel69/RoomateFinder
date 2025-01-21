@@ -116,7 +116,7 @@ class MatchReqView(APIView):
     def post(self,request):
         requesting_user = request.user
         
-        request_user = request.POST.get('username')
+        request_user = request.data.get('username')
     
         request_user = User.objects.get(username=request_user)
 
