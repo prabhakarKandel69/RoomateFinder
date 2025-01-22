@@ -154,7 +154,7 @@ class MatchRequests(APIView):
         except UserProfile.DoesNotExist:
             return Response({"error":"You don't have a profile"},status=status.HTTP_400_BAD_REQUEST)
         
-        match_requests = Match.objects.filter(user_2=request.user)
+        match_requests = Match.objects.filter(user_2=request.user,matched=False)
         requesting_profile_list = []
 
         for match_req in match_requests:
