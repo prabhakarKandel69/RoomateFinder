@@ -47,7 +47,7 @@ const Suggestions = () => {
               <Button
                 label="View Profile"
                 className="px-2 py-1 rounded-lg bg-secondary text-white hover:bg-blue-700"
-                onClick={() => navigate(`/profile/${user.username}`)} // Corrected navigation
+                onClick={() => navigate(`/profile/${user.username}/Dashboard`)} // Corrected navigation
               />
             </li>
           </div>

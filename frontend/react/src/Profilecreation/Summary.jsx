@@ -14,7 +14,7 @@ const Summary = ({ formData }) => {
   // Function to refresh token
   const refreshAccessToken = async () => {
     try {
-      const refreshToken = localStorage.getItem("refresh_token");
+      const refreshToken = localStorage.getItem("refrehToken");
       if (!refreshToken) {
         throw new Error("No refresh token found");
       }

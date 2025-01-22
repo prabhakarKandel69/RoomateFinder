@@ -1,6 +1,9 @@
 import React from "react";
+import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
 const Card = ({ username, address, profile_pic, min_budget, max_budget }) => {
+  const navigate = useNavigate();
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden max-w-xs w-full sm:w-auto">
       {/* Profile Picture */}
@@ -19,9 +22,11 @@ const Card = ({ username, address, profile_pic, min_budget, max_budget }) => {
         <p className="text-gray-600 text-sm mt-1">
           <strong>Budget:</strong> Rs {min_budget} - Rs {max_budget}
         </p>
-        <button className="mt-4 bg-[#243B55] text-white px-4 py-2 rounded w-full">
-          View Profile
-        </button>
+        <Button 
+          className="mt-4 bg-secondary text-white px-4 py-2 rounded-lg w-full"
+          label="View Profile"
+          onClick={() => navigate(`/profile/${username}/Matches`)}
+        />
       </div>
     </div>
   );

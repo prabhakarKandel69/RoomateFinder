@@ -38,7 +38,7 @@ const Dnavbar = () => {
         {/* Logo Section */}
         <div className="flex items-center">
           <img
-            src="../img/logo.png" // Replace with your logo URL
+            src="../../img/logo.png" // Replace with your logo URL
             alt="Logo"
             className="h-[50px] w-[50px] mr-2"
           />
