@@ -27,6 +27,13 @@ const Dsnavbar = ({ active }) => {
           className="w-full mb-2 px-5 py-3 rounded-lg "
           onClick={() => handleNavigation('Dashboard', '/dashboard')}
         />
+         <Button
+          label="Matches"
+          icon={<span className="mr-2">⚙️</span>}
+          isActive={activeButton === 'Matches'}
+          className="w-full  mb-2  px-5 py-3 rounded-lg"
+          onClick={() => handleNavigation('Matches', '/matches')}
+        />
         <Button
           label="Messages"
           icon={<span className="mr-2">💬</span>}

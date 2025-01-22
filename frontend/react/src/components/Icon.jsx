@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Icon = ({ name, className = 'w-5 h-5' }) => {
+const Icon = ({ name, className = 'w-5 h-5' ,src}) => {
   const icons = {
     home: (
         <svg
@@ -79,7 +79,7 @@ const Icon = ({ name, className = 'w-5 h-5' }) => {
     location: (
      
           <img
-            src="../img/location.svg"
+            src={src ||"../img/location.svg"}
             alt="location"
             className={className}
           />
@@ -88,7 +88,7 @@ const Icon = ({ name, className = 'w-5 h-5' }) => {
     request: (
                 
                   <img
-                    src="../img/request.svg"
+                    src={src ||"/img/request.svg"}
                     alt="location"
                     className={className}
                   />

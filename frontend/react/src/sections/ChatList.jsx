@@ -1,85 +1,45 @@
-import React, { useState } from "react";
-
-const users = [
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak fgdfgdfgdfgv dfgfdg dfgfd",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak...",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak fgdfgdfgdfgv dfgfdg dfgfd",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak...",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak fgdfgdfgdfgv dfgfdg dfgfd",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak...",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak fgdfgdfgdfgv dfgfdg dfgfd",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak...",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak fgdfgdfgdfgv dfgfdg dfgfd",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak...",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak fgdfgdfgdfgv dfgfdg dfgfd",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak...",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak fgdfgdfgdfgv dfgfdg dfgfd",
-    avatar: "https://via.placeholder.com/40",
-  },
-  {
-    name: "Aakash Raj Jha",
-    message: "Chin tapak dam dam, Chin tapak...",
-    avatar: "https://via.placeholder.com/40",
-  },
-  // Additional users omitted for brevity
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ChatList = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState([]); // Store matched users
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchMatchedUsers = async () => {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        const response = await axios.get("http://127.0.0.1:8000/matches/matched/", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setUsers(response.data); // Update users state with fetched data
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching matched users:", error);
+        setError("Failed to load matched users.");
+        setLoading(false);
+      }
+    };
+
+    fetchMatchedUsers();
+  }, []);
 
   const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // Check if name exists and is a string, then call toLowerCase
+    user.first_name && typeof user.first_name === "string" && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="w-full max-w-xs md:max-w-md bg-white p-4 flex flex-col">
@@ -101,13 +61,15 @@ const ChatList = () => {
             className="flex items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer"
           >
             <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-10 h-10 rounded-full mr-3"
+              src={`http://127.0.0.1:8000${user.profile_pic}`} // Assuming profile_pic is a valid path
+              alt={user.first_name}
+              className="w-10 h-10 rounded-full mr-3 object-cover"
             />
             <div className="flex flex-col overflow-hidden">
-              <p className="font-semibold text-sm">{user.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user.message}</p>
+              <p className="font-semibold text-sm">
+                {user.first_name} {user.last_name}
+              </p>
+              <p className="text-xs text-gray-500 truncate">{user.email}</p>
             </div>
           </div>
         ))}

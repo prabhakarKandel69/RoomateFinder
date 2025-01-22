@@ -54,7 +54,7 @@ const Dashboard = () => {
 
           {/* Profile Card Content */}
           <div className="flex-1 m-3">
-            {loading && <p>Loading...</p>} {/* Show loading state */}
+            {loading} {/* Show loading state */}
             {error && <p className="text-red-500">{error}</p>} {/* Show error message */}
             {userData && !loading && !error && <ProfileCard userData={userData} />} {/* Render ProfileCard only when data is available */}
             <div >
