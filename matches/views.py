@@ -186,7 +186,7 @@ class MatchUser(APIView):
             return Response({"error":"The user doesnot have a profile..."},status=status.HTTP_400_BAD_REQUEST)    
         
         try:
-            next_user = User.objects.get(username=request.POST.get('username'))
+            next_user = User.objects.get(username=request.data.get('username'))
             next_profile = next_user.profile
         except UserProfile.DoesNotExist:
             return Response({"error":"The user you are trying to match with doesnot have a profile"},status=status.HTTP_400_BAD_REQUEST)
