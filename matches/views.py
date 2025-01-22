@@ -124,10 +124,14 @@ class MatchReqView(APIView):
             requesting_user_profile = requesting_user.profile
             try:
                 request_user_profile = request_user.profile
-                match = Match(user_1=requesting_user,user_2=request_user)
-                match.save()
-                Notification.objects.create(user1=requesting_user,user2=request_user,notification_action='matchrequest')
-                return Response({"success":f"Sent match request to {request_user.username}"},status=status.HTTP_200_OK)
+                try:
+                    match = Match.objects.get(user_1=requesting_user,user_2=request_user)
+                    return Response({"error": "Match request already sent."}, status=status.HTTP_400_BAD_REQUEST)
+                except Match.DoesNotExist:
+                    match = Match(user_1=requesting_user,user_2=request_user)
+                    match.save()
+                    Notification.objects.create(user1=requesting_user,user2=request_user,notification_action='matchrequest')
+                    return Response({"success":f"Sent match request to {request_user.username}"},status=status.HTTP_200_OK)
 
             except UserProfile.DoesNotExist:
                 return Response({"error": "The user you requested doesnt have a profile."}, status=status.HTTP_400_BAD_REQUEST)
