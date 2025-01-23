@@ -266,3 +266,4 @@ xhtml2pdf==0.2.16
 yarl==1.18.3
 zope.event==5.0
 zope.interface==7.2
+django-allauth
