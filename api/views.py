@@ -14,7 +14,74 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.parsers import MultiPartParser, FormParser
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
+class GoogleAuthView(APIView):
+    @swagger_auto_schema(
+        operation_id='google_auth',
+        operation_description="Authenticate a user using Google OAuth2 token.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'token': openapi.Schema(type=openapi.TYPE_STRING, description='Google OAuth2 token')
+            }
+        ),
+        responses={
+            200: openapi.Response(
+                description="User authenticated successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'token': openapi.Schema(type=openapi.TYPE_STRING),
+                        'user': openapi.Schema(type=openapi.TYPE_STRING),
+                        'email': openapi.Schema(type=openapi.TYPE_STRING),
+                        'new_user': openapi.Schema(type=openapi.TYPE_BOOLEAN)
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Invalid token",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            )
+        },
+        tags=['Social Auth']
+    )
+    def post(self,request,*args,**kwargs):
+        token = request.data.get("token")
+        if not token:
+            return Response({"error":"Token is required"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            client_id = "196828978693-8qlp7tl16dr587hc76er3nvfjef7n187.apps.googleusercontent.com"
+            idinfo = id_token.verify_oauth2_token(token,requests.Request(),client_id)
+
+            google_user_id = idinfo['sub']
+            email = idinfo['email']
+            name = idinfo.get('name','')
+
+            user,created = User.objects.get_or_create(username=email,defaults={"email":email,"first_name":name})
+
+            from rest_framework.authtoken.models import Token
+            token,_ =  Token.objects.get_or_create(user=user)   
+
+            return Response(
+                {
+                    "message":"User authenticated successfully",
+                    "token":token.key,
+                    "user":user.username,
+                    "email":user.email,
+                    "new_user":created
+                },status=status.HTTP_200_OK
+            )
+        except ValueError:
+            return Response({"error":"Invalid token"},status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomLogin(TokenObtainPairView):
