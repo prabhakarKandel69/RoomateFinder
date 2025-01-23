@@ -23,6 +23,7 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+    
     path('api-docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('docs/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('register/', RegisterView.as_view(), name='register'),
@@ -35,7 +36,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/<str:username>/',PublicProfileView.as_view(),name='public_profile'),
     path('profile/',ProfileView.as_view(),name='profile'),
-    path('delete-account/',DeleteAccountView.as_view(),name='delete-account')
+    path('delete-account/',DeleteAccountView.as_view(),name='delete-account'),
+    path('auth/google/',GoogleAuthView.as_view(),name='google_auth'),
 ]
 
 
