@@ -10,6 +10,7 @@ from .models import Match
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from notifications.models import Notification
+from django.db.models import Q
 
 
 
@@ -221,7 +222,7 @@ class MatchedView(APIView):
         except UserProfile.DoesNotExist:
             return Response({"error":"You don't have a profile"},status=status.HTTP_400_BAD_REQUEST)
         
-        matches = Match.objects.filter(user_1=request.user,matched=True)
+        matches = Match.objects.filter(Q(user_1=request.user) | Q(user_2=request.user),matched=True)
         matched_profile_list = []
 
         for match in matches:
