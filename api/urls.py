@@ -11,15 +11,41 @@ from django.conf.urls.static import static
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Roommate Finder API",
+        title="RoommateFinder Chat API",
         default_version='v1',
-        description="API documentation for Roommate Finder application",
-        contact=openapi.Contact(email="pkandel6969@gmail.com"),
+        description="""
+            **WebSocket Endpoint**:  
+            `ws/chat/<room_name>/`  
+            - Connect to this WebSocket endpoint with a room name.
+            - Example: `ws://127.0.0.1:8000/ws/chat/admin_prabh/`.
+            - Messages should be sent in the following format:  
+              ```json
+              {
+                  "message": "Hello, World!",(required)
+                  "attachment": "data:image/png;base64,<base64-encoded-data>"(may be null)
+              }
+              ```
+            - Response would be:
+
+            ```json
+              {
+                  "message": <message>,
+                  "attachment_url": <url>(may be null),
+                  "sender": <username>
+              }
+              ```
+
+
+
+            **HTTP Endpoints**:
+        """,
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="support@roommatefinder.com"),
+        license=openapi.License(name="BSD License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
-
 
 
 urlpatterns = [
