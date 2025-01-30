@@ -15,7 +15,7 @@ const AuthRedirect = ({ children }) => {
       }
 
       const response = await axios.post(
-        'http://127.0.0.1:8000/api/token/refresh/', // Refresh token endpoint
+        'http://127.0.0.1:7999/api/token/refresh/', // Refresh token endpoint
         { refresh: refreshToken } // Ensure the key matches your backend implementation
       );
 
@@ -46,7 +46,7 @@ const AuthRedirect = ({ children }) => {
 
       // Validate the token or use it directly
       try {
-        await axios.get('http://127.0.0.1:8000/api/profile/', {
+        await axios.get('http://127.0.0.1:7999/api/profile/', {
           headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
         });
         setLoading(false); // Token is valid

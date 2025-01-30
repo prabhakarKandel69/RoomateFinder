@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const ChatList = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUsers] = useState([]); // Store matched users
+const ChatList = ({ onUserSelect }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchMatchedUsers = async () => {
       try {
-        const accessToken = localStorage.getItem("accessToken");
-        const response = await axios.get("http://127.0.0.1:8000/matches/matched/", {
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await axios.get('http://127.0.0.1:7999/matches/matched/', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setUsers(response.data); // Update users state with fetched data
+        setUsers(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching matched users:", error);
-        setError("Failed to load matched users.");
+        console.error('Error fetching matched users:', error);
+        setError('Failed to load matched users.');
         setLoading(false);
       }
     };
@@ -28,9 +28,11 @@ const ChatList = () => {
     fetchMatchedUsers();
   }, []);
 
-  const filteredUsers = users.filter((user) =>
-    // Check if name exists and is a string, then call toLowerCase
-    user.first_name && typeof user.first_name === "string" && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.first_name &&
+      typeof user.first_name === 'string' &&
+      user.first_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -42,7 +44,7 @@ const ChatList = () => {
   }
 
   return (
-    <div className="w-full max-w-xs md:max-w-md bg-white p-4 flex flex-col">
+    <div className="w-full h-screen max-w-xs md:max-w-md bg-white p-4 flex flex-col">
       <div className="w-full flex flex-col items-center sticky top-0 z-10 bg-white pb-2">
         <div className="relative w-full">
           <input
@@ -59,9 +61,10 @@ const ChatList = () => {
           <div
             key={index}
             className="flex items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer"
+            onClick={() => onUserSelect(user)} // Pass the selected user
           >
             <img
-              src={`http://127.0.0.1:8000${user.profile_pic}`} // Assuming profile_pic is a valid path
+              src={`http://127.0.0.1:7999${user.profile_pic}`}
               alt={user.first_name}
               className="w-10 h-10 rounded-full mr-3 object-cover"
             />

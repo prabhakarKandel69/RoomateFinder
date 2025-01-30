@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Dnavbar from '../components/Dnavbar';
 import Dsnavbar from '../components/Dsnavbar';
-import AuthRedirect from '../components/AuthRedirect';
 import ChatList from '../sections/ChatList';
-
+import MessageArea from '../sections/Messagearea';
 
 const Messages = () => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null); // Track selected user
   const navigate = useNavigate();
 
- 
+  const handleUserSelect = (user) => {
+    setSelectedUser(user); // Set selected user
+  };
 
   return (
     <>
-    <AuthRedirect>
       <div className="bg-primary">
         <Dnavbar />
         <div className="flex flex-col md:flex-row flex-1">
@@ -26,24 +23,19 @@ const Messages = () => {
             <Dsnavbar active="Messages" />
           </div>
 
-          <div className="w-full h-[100vh] md:w-1/5 bg-white flex flex-col p-0 m-8 ">
-           <div className="flex-1 ">
-            <ChatList />
+          {/* Chat List */}
+          <div className="w-full h-screen md:w-1/5 bg-white flex flex-col p-0 m-8 rounded-lg shadow-lg">
+            <div className="flex-1">
+              <ChatList onUserSelect={handleUserSelect} />
             </div>
-
           </div>
 
-         
-
-        
-
-            
-         
-
-
+          {/* Message Area */}
+          <div className="flex-grow p-4 m-8 ">
+            <MessageArea selectedUser={selectedUser} />
+          </div>
         </div>
       </div>
-      </AuthRedirect>
     </>
   );
 };

@@ -10,7 +10,7 @@ const AuthOverlay = ({ onClose }) => {
   const [formKey, setFormKey] = useState(Date.now()); // Key to reset form
   const navigate = useNavigate();  // Initialize the navigate function
 
-  const apiUrl = 'http://127.0.0.1:8000';
+  const apiUrl = 'http://127.0.0.1:7999';
 
   const handleToggle = () => {
     setIsLogin(!isLogin);
@@ -31,7 +31,7 @@ const AuthOverlay = ({ onClose }) => {
       localStorage.setItem('refreshToken', response.data.refresh);
   
       // Check if the profile exists by sending a GET request to the profile endpoint
-      const profileResponse = await axios.get('http://127.0.0.1:8000/api/profile/', {
+      const profileResponse = await axios.get('http://127.0.0.1:7999/api/profile/', {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${response.data.access}`,
