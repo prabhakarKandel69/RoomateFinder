@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Icon from "../components/Icon";
 
 const ProfileCard = ({ userData }) => {
@@ -14,6 +14,11 @@ const ProfileCard = ({ userData }) => {
     introvert: "Introvert",
     is_looking: "",
   };
+
+  // Store username in localStorage when userData is available
+
+      localStorage.setItem("username", userData.username); // Store first name in localStorage
+
 
   // Filter keys with true values
   const trueKeys = Object.keys(userData).filter((key) => userData[key] === true);
@@ -39,10 +44,6 @@ const ProfileCard = ({ userData }) => {
           <h2 className="text-xl font-bold text-gray-800">
             {userData.first_name || "Aakash Raj Jha"} {userData.last_name}, {userData.age || 24}
           </h2>
-          {/* Status Badge */}
-          {/* <span className="px-3 py-1 text-sm font-medium text-white bg-secondary rounded-lg mt-2 md:mt-0">
-            {userData.is_looking ? "Looking For Roommate" : "Not Looking"}
-          </span> */}
         </div>
 
         {/* Location */}
