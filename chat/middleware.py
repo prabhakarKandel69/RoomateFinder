@@ -4,40 +4,45 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from channels.db import database_sync_to_async
 from collections import deque
+import logging
+
+logger = logging.getLogger('django')
+
+from urllib.parse import parse_qs
 
 class JWTAuthMiddleware(BaseMiddleware):
     def __init__(self, inner):
         super().__init__(inner)
 
     async def __call__(self, scope, receive, send):
-        # Extract JWT from the 'Authorization' header
-        token = None
-        for item in scope.get('headers', []):
-            if item[0] == b'authorization':
-                token = item[1].decode('utf-8').split(' ')[1]  # Extract token after 'Bearer'
+        # Extract token from query parameters
+        query_string = scope.get("query_string", b"").decode("utf-8")
+        query_params = parse_qs(query_string)
+        token = query_params.get("token", [None])[0]  # Get the token from query params
 
-        # If there's a token, validate it
+        logger.info(f"Extracted token: {token}")
+
         if token:
             try:
                 payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-                user = await self.get_user(payload['user_id'])
-                scope['user'] = user  # Attach user to scope
+                logger.info(f"Decoded payload: {payload}")
+                user = await self.get_user(payload['user_id'])  # Call explicitly
+                scope['user'] = user
             except jwt.ExpiredSignatureError:
-                # Token expired
+                logger.error("Token is expired")
                 scope['user'] = None
             except jwt.DecodeError:
-                # Invalid token
+                logger.error("Token decoding failed")
                 scope['user'] = None
         else:
-            # No token found, assign anonymous user
+            logger.error("No token found in query parameters")
             scope['user'] = None
 
-        # Call the next layer (e.g., consumer)
         return await super().__call__(scope, receive, send)
 
-    # This method will retrieve the user from the database
+    @staticmethod
     @database_sync_to_async
-    def get_user(self, user_id):
+    def get_user(user_id):
         try:
             return get_user_model().objects.get(id=user_id)
         except get_user_model().DoesNotExist:

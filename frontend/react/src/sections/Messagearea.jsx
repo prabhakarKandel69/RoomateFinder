@@ -6,17 +6,20 @@ const MessageArea = ({ selectedUser }) => {
   const [newMessage, setNewMessage] = useState("");
   const [attachment, setAttachment] = useState(null);
 
-  const token = localStorage.getItem("token");
   const username = localStorage.getItem("username");
   const roomName = selectedUser ? `${username}_${selectedUser.username}` : null;
 
   useEffect(() => {
     if (!roomName) return;
+    const token = localStorage.getItem('accessToken');
+
+    if(!token){
+      console.error("No access token found");
+      return;
+    }
   
-    const ws = new WebSocket(
-      `ws://127.0.0.1:8000/ws/chat/${roomName}/`,
-      token ? [`Bearer ${token}`] : []
-    );
+  
+    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/?token=${token}`);
   
     ws.onopen = () => {
       console.log("WebSocket connected successfully");
@@ -41,7 +44,7 @@ const MessageArea = ({ selectedUser }) => {
     return () => {
       ws.close();
     };
-  }, [roomName, token]);
+  }, [roomName]);
 
   const sendMessage = () => {
     if (!newMessage && !attachment) return;
