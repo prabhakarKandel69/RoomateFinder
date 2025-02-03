@@ -79,7 +79,7 @@ class RecentMessages(APIView):
             if last_message:
                 recent_messages.append(last_message)
 
-        recent_messages.reverse()
+        
         
         serializer = self.serializer_class(recent_messages, many=True)
         return Response(serializer.data)
@@ -135,7 +135,7 @@ class MessageDetail(APIView):
         
         messages = Message.objects.filter(
             Q(sender=curr_user, receiver=other_user) | Q(sender=other_user, receiver=curr_user)
-        ).order_by('sent_at').reverse()
+        ).order_by('sent_at')
 
         messages.update(seen=True, seenat=timezone.now())
 
