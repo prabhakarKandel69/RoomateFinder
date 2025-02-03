@@ -159,7 +159,7 @@ const MessageArea = ({ selectedUser }) => {
               >
                 <p>{msg.message}</p>
                 {msg.attachment && (
-                  <img src={msg.attachment} alt="Attachment" className="mt-2 max-w-xs rounded-lg" />
+                  <img src={`http://127.0.0.1:7999${msg.attachment}`} alt="Attachment" className="mt-2 max-w-xs rounded-lg" />
                 )}
               </div>
 
