@@ -104,7 +104,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "type": "chat_message",
                     "message": message,
                     "sender": self.user.username,
-                    "attachment_url": attachment_path,  # Ensure this is the correct path
+                    "attachment_url": attachment_path,
                 }
             )
         except Exception as e:
@@ -157,7 +157,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             raise ValueError("File saving failed.")
 
         # Return the relative media URL
-        return f"/media/{filename}"
+        return f"{filename}"
 
 
             
