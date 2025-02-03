@@ -31,7 +31,7 @@ const Messages = () => {
           </div>
 
           {/* Message Area */}
-          <div className="flex-grow p-4 m-8 ">
+          <div className="flex-grow p-4 ">
             <MessageArea selectedUser={selectedUser} />
           </div>
         </div>
