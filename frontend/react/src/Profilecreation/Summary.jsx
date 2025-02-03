@@ -19,7 +19,7 @@ const Summary = ({ formData }) => {
         throw new Error("No refresh token found");
       }
 
-      const response = await axios.post("http://127.0.0.1:8000/api/token/refresh/", { refresh: refreshToken });
+      const response = await axios.post("http://127.0.0.1:7999/api/token/refresh/", { refresh: refreshToken });
 
       localStorage.setItem("accessToken", response.data.access);
       return response.data.access; // Return new token
@@ -37,7 +37,7 @@ const handleSubmit = async () => {
   let accessToken = getAccessToken();
 
   try {
-    const response = await axios.post("http://127.0.0.1:8000/api/profile/", formData, {
+    const response = await axios.post("http://127.0.0.1:7999/api/profile/", formData, {
       headers: {
         "Content-Type": "application/json",
         "Content-Type": "multipart/form-data", // Correct content type for file upload
@@ -58,7 +58,7 @@ const handleSubmit = async () => {
 
       if (accessToken) {
         try {
-          const retryResponse = await axios.post("http://127.0.0.1:8000/api/profile/", formData, {
+          const retryResponse = await axios.post("http://127.0.0.1:7999/api/profile/", formData, {
             headers: {
               "Content-Type": "application/json",
               "Content-Type": "multipart/form-data", // Correct content type for file upload

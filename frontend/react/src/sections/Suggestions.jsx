@@ -11,7 +11,7 @@ const Suggestions = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/matches/", {
+        const response = await axios.get("http://127.0.0.1:7999/matches/", {
           headers: {
             Authorization: `Bearer ${accessToken}`, // Sending token in headers
           },
@@ -36,7 +36,7 @@ const Suggestions = () => {
               {/* Profile Picture */}
               <div className="flex items-center">
                 <img
-                  src={`http://127.0.0.1:8000${user.profile_pic}` || "https://www.alucoildesign.com/assets/pages/media/profile/profile_user.jpg"} 
+                  src={`http://127.0.0.1:7999${user.profile_pic}` || "https://www.alucoildesign.com/assets/pages/media/profile/profile_user.jpg"} 
                   alt={user.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />

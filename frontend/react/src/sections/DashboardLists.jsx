@@ -40,7 +40,7 @@ const DashboardLists = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/matches/", {
+        const response = await axios.get("http://127.0.0.1:7999/matches/", {
           headers: {
             Authorization: `Bearer ${accessToken}`, // Sending token in headers
           },
@@ -95,7 +95,7 @@ const DashboardLists = () => {
             {matches.map((match, index) => (
               <li key={index} className="flex items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-4">
-                  <img src={`http://127.0.0.1:8000${match.profile_pic}`} alt={match.username} className="w-10 h-10 rounded-full" />
+                  <img src={`http://127.0.0.1:7999${match.profile_pic}`} alt={match.username} className="w-10 h-10 rounded-full" />
                   <div>
                   <p className="text-sm text-gray-700 font-semibold">{match.first_name || 'admin'}</p>
                   <p className="text-xs text-gray-500">{match.matchPercentage}</p>
