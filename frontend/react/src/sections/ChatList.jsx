@@ -105,7 +105,7 @@ const ChatList = ({ onUserSelect }) => {
               <div className="flex flex-col overflow-hidden">
                 <p className="font-semibold text-sm">{user.first_name} {user.last_name}</p>
                 <p className={`text-xs truncate ${isSender ? "text-gray-500" : "text-gray-500"}`}>
-                  {isSender ? "You: " : ""}{latestMessage}
+                  {isSender ? " " : "You:"}{latestMessage}
                 </p>
               </div>
             </div>

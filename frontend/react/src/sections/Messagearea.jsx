@@ -6,7 +6,7 @@ const MessageArea = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [attachment, setAttachment] = useState(null);
-  const chatContainerRef = useRef(null); // Reference for chat container
+  const chatContainerRef = useRef(null); // Reference for auto-scrolling
 
   const username = localStorage.getItem("username");
   const roomName = selectedUser ? `${username}_${selectedUser.username}` : null;
@@ -38,7 +38,12 @@ const MessageArea = ({ selectedUser }) => {
           attachment: msg.attachment,
           sentAt: msg.sent_at,
         }));
-        setMessages(formattedMessages.reverse()); // Reverse order
+        setMessages(formattedMessages); // Keep messages in natural order (oldest to latest)
+        
+        // Scroll to bottom after loading messages
+        setTimeout(() => {
+          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }, 100);
       })
       .catch((error) => {
         console.error("Error fetching older messages:", error.response?.data || error.message);
@@ -53,7 +58,12 @@ const MessageArea = ({ selectedUser }) => {
     ws.onmessage = (event) => {
       console.log("Message received:", event.data);
       const data = JSON.parse(event.data);
-      setMessages((prevMessages) => [data, ...prevMessages]); // Add new message at the top
+      setMessages((prevMessages) => [...prevMessages, data]); // Append new messages at the bottom
+      
+      // Scroll to bottom when a new message is received
+      setTimeout(() => {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }, 100);
     };
 
     ws.onclose = () => {
@@ -70,13 +80,6 @@ const MessageArea = ({ selectedUser }) => {
       ws.close();
     };
   }, [roomName]);
-
-  // Scroll to top when new messages arrive (since messages are reversed)
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = 0; // Scroll to the top
-    }
-  }, [messages]);
 
   const sendMessage = () => {
     if (!newMessage && !attachment) return;
@@ -128,10 +131,10 @@ const MessageArea = ({ selectedUser }) => {
         </div>
       </div>
 
-      {/* Messages List (Reversed Order) */}
+      {/* Messages List (Oldest at Top, Latest at Bottom) */}
       <div
-        ref={chatContainerRef} // Attach ref to the message container
-        className="flex-grow overflow-y-auto p-4 space-y-3 flex flex-col-reverse"
+        ref={chatContainerRef} // Attach ref to enable auto-scroll
+        className="flex-grow overflow-y-auto p-4 space-y-3 flex flex-col"
       >
         {messages.map((msg, index) => {
           const isSender = msg.sender === username;
