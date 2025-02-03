@@ -233,8 +233,9 @@ class MatchedView(APIView):
         for match in matches:
             if(match.user_1 == request.user):
                 matched_profile_list.append(match.user_2.profile)
-            else:
-                matched_profile_list.append(match.user_2.profile)
+
+            if (match.user_2 == request.user):
+                matched_profile_list.append(match.user_1.profile)
         
         matches = matched_profile_list
 
