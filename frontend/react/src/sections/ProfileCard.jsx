@@ -18,6 +18,7 @@ const ProfileCard = ({ userData }) => {
   // Store username in localStorage when userData is available
 
       localStorage.setItem("username", userData.username); // Store first name in localStorage
+      localStorage.setItem("image", userData.profile_pic); // Store profile picture in localStorage
 
 
   // Filter keys with true values
@@ -25,7 +26,7 @@ const ProfileCard = ({ userData }) => {
 
   // Default or dynamic profile picture
   const profilePic = userData.profile_pic
-    ? `http://127.0.0.1:8000${userData.profile_pic}`
+    ? `http://127.0.0.1:7999${userData.profile_pic}`
     : "https://via.placeholder.com/80";
 
   return (

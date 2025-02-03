@@ -1,25 +1,32 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const api = axios.create({
     baseURL: "http://127.0.0.1:7999/", // ✅ Replace with your actual API
     headers: { "Content-Type": "application/json" },
 });
 
-// 🔹 Automatically attach access token to requests
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-        config.headers["Authorization"] = `Bearer ${token}`;
+// 🔹 Check if the access token exists and is expired
+const isTokenExpired = (token) => {
+    if (!token) return true; // No token means it's expired or missing
+    try {
+        const decoded = jwtDecode(token);
+        return decoded.exp * 1000 < Date.now(); // Check if token expiry is in the past
+    } catch (error) {
+        return true; // Invalid token, consider expired
     }
-    return config;
-});
+};
 
 // 🔹 Function to refresh token
 const refreshToken = async () => {
+    const refresh = localStorage.getItem("refreshToken");
+    if (!refresh) {
+        window.location.href = "/"; // 🚀 Redirect to login if refresh token is missing
+        return null;
+    }
+
     try {
-        const response = await axios.post("http://127.0.0.1:7999/api/token/refresh/", {
-            refresh: localStorage.removeItem('accessToken'),
-        });
+        const response = await axios.post("http://127.0.0.1:7999/api/token/refresh/", { refresh });
 
         if (response.status === 200) {
             localStorage.setItem("accessToken", response.data.access);
@@ -35,7 +42,22 @@ const refreshToken = async () => {
     }
 };
 
-// 🔹 Axios interceptor for handling expired token
+// 🔹 Auto-refresh token if expired before making requests
+api.interceptors.request.use(async (config) => {
+    let token = localStorage.getItem("accessToken");
+
+    if (isTokenExpired(token)) {
+        token = await refreshToken(); // Refresh the token if expired
+    }
+
+    if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+});
+
+// 🔹 Handle 401 Unauthorized responses (force refresh if needed)
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -49,5 +71,13 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+// 🔹 Redirect to /dashboard if access token is valid
+(async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && !isTokenExpired(accessToken) && window.location.pathname === "/") {
+        window.location.href = "/dashboard";
+    }
+})();
 
 export default api;

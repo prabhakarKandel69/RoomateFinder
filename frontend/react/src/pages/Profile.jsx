@@ -113,7 +113,7 @@ const Profile = () => {
 
             {/* Profile Picture */}
             <img
-              src={`http://127.0.0.1:8000${profileData.profile_pic}`}
+              src={`http://127.0.0.1:7999${profileData.profile_pic}`}
               alt="Profile"
               className="w-32 h-32 sm:w-40 sm:h-40 rounded-full mx-auto border-4 border-blue-500 object-cover"
             />

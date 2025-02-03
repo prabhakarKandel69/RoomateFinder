@@ -1,50 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 const MessageArea = ({ selectedUser }) => {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [attachment, setAttachment] = useState(null);
+  const chatContainerRef = useRef(null); // Reference for chat container
 
   const username = localStorage.getItem("username");
   const roomName = selectedUser ? `${username}_${selectedUser.username}` : null;
 
   useEffect(() => {
     if (!roomName) return;
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
 
-    if(!token){
+    if (!token) {
       console.error("No access token found");
       return;
     }
-  
-  
+
+    // Fetch older messages
+    axios
+      .get(`http://127.0.0.1:7999/chat/message/${selectedUser.username}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("Fetched older messages:", response.data);
+        const formattedMessages = response.data.map((msg) => ({
+          id: msg.id,
+          sender: msg.sender_username,
+          receiver: msg.receiver_username,
+          message: msg.message_text,
+          attachment: msg.attachment,
+          sentAt: msg.sent_at,
+        }));
+        setMessages(formattedMessages.reverse()); // Reverse order
+      })
+      .catch((error) => {
+        console.error("Error fetching older messages:", error.response?.data || error.message);
+      });
+
     const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/?token=${token}`);
-  
+
     ws.onopen = () => {
       console.log("WebSocket connected successfully");
     };
-  
+
     ws.onmessage = (event) => {
       console.log("Message received:", event.data);
       const data = JSON.parse(event.data);
-      setMessages((prevMessages) => [...prevMessages, data]);
+      setMessages((prevMessages) => [data, ...prevMessages]); // Add new message at the top
     };
-  
+
     ws.onclose = () => {
       console.log("WebSocket disconnected");
     };
-  
+
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
     };
-  
+
     setSocket(ws);
-  
+
     return () => {
       ws.close();
     };
   }, [roomName]);
+
+  // Scroll to top when new messages arrive (since messages are reversed)
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = 0; // Scroll to the top
+    }
+  }, [messages]);
 
   const sendMessage = () => {
     if (!newMessage && !attachment) return;
@@ -86,7 +118,7 @@ const MessageArea = ({ selectedUser }) => {
       {/* Profile Info Section */}
       <div className="p-4 bg-white border-b flex items-center space-x-4">
         <img
-          src={`http://127.0.0.1:7999${selectedUser.profile_pic} `|| "https://via.placeholder.com/50"}
+          src={`http://127.0.0.1:7999${selectedUser.profile_pic}` || "https://via.placeholder.com/50"}
           alt={selectedUser.username}
           className="w-12 h-12 rounded-full object-cover"
         />
@@ -96,25 +128,48 @@ const MessageArea = ({ selectedUser }) => {
         </div>
       </div>
 
-      {/* Messages List */}
-      <div className="flex-grow overflow-y-auto p-4">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`mb-2 p-2 rounded ${
-              msg.sender === username ? "bg-blue-200" : "bg-gray-300"
-            }`}
-          >
-            <strong>{msg.sender}</strong>: {msg.message}
-            {msg.attachment_url && (
-              <img
-                src={msg.attachment_url}
-                alt="Attachment"
-                className="mt-2 max-w-xs rounded"
-              />
-            )}
-          </div>
-        ))}
+      {/* Messages List (Reversed Order) */}
+      <div
+        ref={chatContainerRef} // Attach ref to the message container
+        className="flex-grow overflow-y-auto p-4 space-y-3 flex flex-col-reverse"
+      >
+        {messages.map((msg, index) => {
+          const isSender = msg.sender === username;
+          const senderProfilePic = isSender
+            ? `http://127.0.0.1:7999${localStorage.getItem("image")}`
+            : `http://127.0.0.1:7999${selectedUser.profile_pic}`;
+
+          return (
+            <div key={index} className={`flex items-end ${isSender ? "justify-end" : "justify-start"}`}>
+              {!isSender && (
+                <img
+                  src={senderProfilePic || "https://via.placeholder.com/50"}
+                  alt={msg.sender}
+                  className="w-10 h-10 rounded-full object-cover mr-2"
+                />
+              )}
+
+              <div
+                className={`p-3 rounded-lg max-w-xs break-words ${
+                  isSender ? "bg-blue-500 text-white" : "bg-gray-300 text-black"
+                }`}
+              >
+                <p>{msg.message}</p>
+                {msg.attachment && (
+                  <img src={msg.attachment} alt="Attachment" className="mt-2 max-w-xs rounded-lg" />
+                )}
+              </div>
+
+              {isSender && (
+                <img
+                  src={senderProfilePic || "https://via.placeholder.com/50"}
+                  alt="You"
+                  className="w-10 h-10 rounded-full object-cover ml-2"
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Message Input Section */}
@@ -127,17 +182,9 @@ const MessageArea = ({ selectedUser }) => {
           onChange={(e) => setNewMessage(e.target.value)}
         />
 
-        <input
-          type="file"
-          accept="image/*"
-          className="mr-2"
-          onChange={handleAttachmentChange}
-        />
+        <input type="file" accept="image/*" className="mr-2" onChange={handleAttachmentChange} />
 
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
+        <button onClick={sendMessage} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
           Send
         </button>
       </div>
