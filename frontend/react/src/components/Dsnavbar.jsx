@@ -41,13 +41,13 @@ const Dsnavbar = ({ active }) => {
           className="w-full mb-2 px-5 py-3 rounded-lg"
           onClick={() => handleNavigation('Messages', '/messages')}
         />
-        <Button
+        {/* <Button
           label="Settings"
           icon={<span className="mr-2">⚙️</span>}
           isActive={activeButton === 'Settings'}
           className="w-full px-5 py-3 rounded-lg"
           onClick={() => handleNavigation('Settings', '/settings')}
-        />
+        /> */}
       </div>
 
       {/* Bottom Section */}

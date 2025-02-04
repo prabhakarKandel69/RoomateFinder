@@ -63,11 +63,11 @@ const Matches = () => {
 
   return (
     <AuthRedirect>
-      <div className="bg-primary">
-        <Dnavbar />
-        <div className="flex flex-col md:flex-row flex-1">
-          {/* Sidebar */}
-          <div className="w-full min-h-screen md:w-1/5 bg-white flex flex-col justify-between p-4 m-8 rounded-lg shadow-lg">
+      <div className="bg-primary flex flex-col">
+        <Dnavbar active="Matches" />
+        <div className="flex flex-1 md:flex-row">
+          {/* Sidebar (Only Visible on Desktop) */}
+          <div className="hidden md:flex md:w-1/5 bg-white flex-col justify-between p-4 m-4 rounded-lg shadow-lg">
             <Dsnavbar active="Matches" />
           </div>
 

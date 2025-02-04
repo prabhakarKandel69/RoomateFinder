@@ -40,7 +40,7 @@ const DashboardLists = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:7999/matches/", {
+        const response = await axios.get("http://127.0.0.1:7999/matches/matched/", {
           headers: {
             Authorization: `Bearer ${accessToken}`, // Sending token in headers
           },
