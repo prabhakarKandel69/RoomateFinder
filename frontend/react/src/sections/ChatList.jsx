@@ -66,7 +66,7 @@ const ChatList = ({ onUserSelect }) => {
   }
 
   return (
-    <div className="w-full h-screen max-w-xs md:max-w-md bg-white p-4 flex flex-col">
+    <div className="w-full h-screen  bg-white p-4 rounded-lg flex flex-col">
       {/* Search Bar */}
       <div className="w-full flex flex-col items-center sticky top-0 z-10 bg-white pb-2">
         <div className="relative w-full">
@@ -105,7 +105,7 @@ const ChatList = ({ onUserSelect }) => {
               <div className="flex flex-col overflow-hidden">
                 <p className="font-semibold text-sm">{user.first_name} {user.last_name}</p>
                 <p className={`text-xs truncate ${isSender ? "text-gray-500" : "text-gray-500"}`}>
-                  {isSender ? " " : "You:"}{latestMessage}
+                  {isSender ? "You:" : ""}{latestMessage}
                 </p>
               </div>
             </div>

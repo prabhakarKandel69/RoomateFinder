@@ -12,25 +12,22 @@ const customStyles = {
   color: "#243B55",
 };
 
-const Dnavbar = () => {
+const Dnavbar = ({ active }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-    // Function to handle window resize and reset mobile menu state
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setIsMenuOpen(false); // Hide mobile menu when switching to desktop view
-      }
+  const [activeButton, setActiveButton] = useState(active);
+
+  const handleResize = () => {
+    if (window.innerWidth >= 1024) {
+      setIsMenuOpen(false); // Hide mobile menu when switching to desktop
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
     };
-  
-    // Add event listener for resize when component mounts
-    useEffect(() => {
-      window.addEventListener('resize', handleResize);
-  
-      // Clean up the event listener when the component is unmounted
-      return () => {
-        window.removeEventListener('resize', handleResize);
-      };
-    }, []);
+  }, []);
 
   return (
     <nav className="bg-white border-b border-gray-200">
@@ -47,6 +44,7 @@ const Dnavbar = () => {
           </span>
         </div>
 
+        {/* Mobile Menu Button */}
         <div className="lg:hidden transform hover:scale-110 transition-transform duration-300">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -64,7 +62,7 @@ const Dnavbar = () => {
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d={
-                  isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'
+                  isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
                 }
               ></path>
             </svg>
@@ -84,17 +82,17 @@ const Dnavbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div  className={`fixed z-40 top-0 left-0  w-60  transform ${
-          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out`}>
-              <div className=" md:w-1/3 bg-white flex flex-col justify-between p-4 m-1 rounded-lg shadow-lg">
-              
-            <Dsnavbar active="Dashboard"  />
-            </div>
+      {/* Mobile Sidebar (Hidden on Large Screens) */}
+      <div
+        className={`fixed z-50 top-0 left-0 h-full w-64 bg-white shadow-lg transform md:hidden ${
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out`}
+      >
+        <div className="flex-col justify-between p-4">
+          <Dsnavbar active= {activeButton} />
         </div>
-      )}
+
+      </div>
     </nav>
   );
 };
