@@ -62,17 +62,16 @@ const Matches = () => {
   ];
 
   return (
-    <AuthRedirect>
-      <div className="bg-primary flex flex-col">
-        <Dnavbar active="Matches" />
-        <div className="flex flex-1 md:flex-row">
-          {/* Sidebar (Only Visible on Desktop) */}
-          <div className="hidden md:flex md:w-1/5 bg-white flex-col justify-between p-4 m-4 rounded-lg shadow-lg">
-            <Dsnavbar active="Matches" />
-          </div>
+    <div className="bg-primary min-h-screen">
+      <Dnavbar active="Matches" />
+      <div className="flex flex-col md:flex-row flex-1">
+        {/* Sidebar (Only Visible on Desktop) */}
+        <div className="hidden md:flex md:w-1/5 bg-white flex-col justify-between p-4 m-0 md:m-8 rounded-lg shadow-lg">
+          <Dsnavbar active="Matches" />
+        </div>
 
           {/* Main Content */}
-          <div className="flex-1 m-3">
+          <div className="flex-1 m-3 min-h-screen">
             {loading && <p>Loading...</p>}
             {error && <p className="text-red-500">{error}</p>}
             {uniqueMatches.length > 0 ? (
@@ -81,9 +80,10 @@ const Matches = () => {
               <p>No matches found.</p>
             )}
           </div>
+
         </div>
       </div>
-    </AuthRedirect>
+   
   );
 };
 

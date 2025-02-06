@@ -10,17 +10,15 @@ const AuthRedirect = ({ children }) => {
   const refreshAccessToken = async () => {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
+      if (!refreshToken) throw new Error('No refresh token available');
 
       const response = await axios.post(
-        'http://127.0.0.1:7999/api/token/refresh/', // Refresh token endpoint
-        { refresh: refreshToken } // Ensure the key matches your backend implementation
+        'http://127.0.0.1:7999/api/token/refresh/',
+        { refresh: refreshToken }
       );
 
       const { access } = response.data;
-      localStorage.setItem('accessToken', access); // Store the new access token
+      localStorage.setItem('accessToken', access);
       return access;
     } catch (err) {
       console.error('Error refreshing token:', err);
@@ -32,14 +30,13 @@ const AuthRedirect = ({ children }) => {
 
   useEffect(() => {
     const checkAuthentication = async () => {
-      const accessToken = localStorage.getItem('accessToken');
+      let accessToken = localStorage.getItem('accessToken');
 
       if (!accessToken) {
         // Attempt to refresh the token if no access token is found
-        const newAccessToken = await refreshAccessToken();
-        if (!newAccessToken) {
-          setLoading(false);
-          navigate('/home'); // Redirect to login if refresh fails
+        accessToken = await refreshAccessToken();
+        if (!accessToken) {
+          navigate('/home');
           return;
         }
       }
@@ -47,17 +44,16 @@ const AuthRedirect = ({ children }) => {
       // Validate the token or use it directly
       try {
         await axios.get('http://127.0.0.1:7999/api/profile/', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
-        setLoading(false); // Token is valid
+        navigate('/dashboard'); // Token is valid, navigate to dashboard
       } catch (err) {
         console.error('Error validating token:', err);
         const newAccessToken = await refreshAccessToken();
         if (!newAccessToken) {
-          setLoading(false);
-          navigate('/home'); // Redirect to login if refresh fails
+          navigate('/home'); // Redirect to home if refresh fails
         } else {
-          setLoading(false); // Token refreshed successfully
+          navigate('/dashboard'); // Successfully refreshed, navigate to dashboard
         }
       }
     };
@@ -65,11 +61,7 @@ const AuthRedirect = ({ children }) => {
     checkAuthentication();
   }, [navigate]);
 
-  return (
-    <div>
-      { children}
-    </div>
-  );
+  return <>{children}</>;
 };
 
 export default AuthRedirect;

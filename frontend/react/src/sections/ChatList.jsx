@@ -66,7 +66,7 @@ const ChatList = ({ onUserSelect }) => {
   }
 
   return (
-    <div className="w-full h-screen  bg-white p-4 rounded-lg flex flex-col">
+    <div className="w-full min-h-screen bg-white p-4 rounded-lg flex flex-col">
       {/* Search Bar */}
       <div className="w-full flex flex-col items-center sticky top-0 z-10 bg-white pb-2">
         <div className="relative w-full">
@@ -81,7 +81,7 @@ const ChatList = ({ onUserSelect }) => {
       </div>
 
       {/* Chat List */}
-      <div className="space-y-2 overflow-y-auto max-h-[89vh] hide-scrollbar">
+      <div className="space-y-2 overflow-y-auto max-h-[88vh] hide-scrollbar">
         {filteredUsers.map((user, index) => {
           // Find latest message sent or received by this user
           const latestMessageData = Object.values(recentMessages).find(
