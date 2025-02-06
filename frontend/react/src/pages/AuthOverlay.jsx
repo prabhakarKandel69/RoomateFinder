@@ -30,37 +30,41 @@ const AuthOverlay = ({ onClose }) => {
       localStorage.setItem('accessToken', response.data.access);
       localStorage.setItem('refreshToken', response.data.refresh);
   
-      // Check if the profile exists by sending a GET request to the profile endpoint
-      const profileResponse = await axios.get('http://127.0.0.1:7999/api/profile/', {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${response.data.access}`,
-        },
-      });
+      try {
+        // Check if the profile exists by sending a GET request to the profile endpoint
+        const profileResponse = await axios.get(`${apiUrl}/api/profile/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${response.data.access}`,
+          },
+        });
   
-      // Check if profile has an id
-      if (profileResponse.data.user_id) {
-        // If the id exists, navigate to the dashboard
-        navigate('/dashboard');
-        Notification("Login successful", "success");
-        return
-      } 
+        // Check if profile has an id
+        if (profileResponse.data.user_id) {
+          navigate('/dashboard');
+          Notification("Login successful", "success");
+          return;
+        }
+      } catch (profileError) {
+        // If profile fetch fails, check if it's a 404 (profile not found)
+        if (profileError.response?.status === 404) {
+          navigate('/profile-creation');
+          Notification("Please complete your profile creation", "success");
+          return;
+        }
+  
+        // If it's another error, show an error message
+        Notification(`⚠️ Error fetching profile: ${profileError.message}`, "error");
+      }
   
     } catch (error) {
-      // Handle error for login or profile
+      // Handle login errors (wrong credentials, server issues, etc.)
       const errorMsg = error.response?.data
         ? Object.values(error.response.data).flat().join(' ')
         : 'Login failed. Please try again.';
-        if(error.response.data) {
-          // If the id is null or falsy, navigate to profile creation
-          navigate('/profile-creation');
-          Notification("Please complete your profile creation", "success");
-          return
-        }
   
-      // Show error notification
       Notification(`❌ ${errorMsg}`, "error");
-  
+    } finally {
       setLoading(false);
     }
   };
