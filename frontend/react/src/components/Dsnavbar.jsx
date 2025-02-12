@@ -28,8 +28,16 @@ const Dsnavbar = ({ active }) => {
           onClick={() => handleNavigation('Dashboard', '/dashboard')}
         />
          <Button
+          label="Search"
+          icon={<span className="mr-5">🔍</span>}
+          isActive={activeButton === 'search'}
+          className="w-full mb-2 px-5 py-3 rounded-lg" 
+          onClick={() => handleNavigation('search', '/search')}
+        />
+
+         <Button
           label="Matches"
-          icon={<span className="mr-2">⚙️</span>}
+          icon={<span className="mr-2">👬</span>}
           isActive={activeButton === 'Matches'}
           className="w-full  mb-2  px-5 py-3 rounded-lg"
           onClick={() => handleNavigation('Matches', '/matches')}
@@ -41,6 +49,10 @@ const Dsnavbar = ({ active }) => {
           className="w-full mb-2 px-5 py-3 rounded-lg"
           onClick={() => handleNavigation('Messages', '/messages')}
         />
+
+    
+
+
         {/* <Button
           label="Settings"
           icon={<span className="mr-2">⚙️</span>}

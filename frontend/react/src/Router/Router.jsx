@@ -12,6 +12,7 @@ import Preferences from '../Profilecreation/Preferences';
 import BudgetAndRoom from '../Profilecreation/BudgetAndRoom';
 import Summary from '../Profilecreation/Summary';
 import Matches from '../pages/Matches';
+import Search from '../pages/search';
 
 const AppRouter = () => {
 
@@ -54,6 +55,7 @@ const AppRouter = () => {
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/messages' element={<Messages />} />
         <Route path='/matches' element={<Matches />} />
+        <Route path='/search' element={<Search />} />
 
        {/* Profile Creation Routes */}
         <Route path="/profile-creation" element={<PersonalInfo formData={formData} updateFormData={updateFormData} />} />

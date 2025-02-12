@@ -25,7 +25,7 @@ const Card = ({ username, address, profile_pic, min_budget, max_budget }) => {
         <Button 
           className="mt-4 bg-secondary text-white px-4 py-2 rounded-lg w-full"
           label="View Profile"
-          onClick={() => navigate(`/profile/${username}/Matches`)}
+          onClick={() => navigate(`/profile/${username}/search`)}
         />
       </div>
     </div>
