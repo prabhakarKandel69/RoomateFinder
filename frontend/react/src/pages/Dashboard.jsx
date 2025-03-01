@@ -51,7 +51,7 @@ const Dashboard = () => {
           {error && <p className="text-red-500">{error}</p>}
           {userData && <ProfileCard userData={userData} />}
           <DashboardCards data={dashboardData} />
-          <DashboardLists />
+          <DashboardLists userData={userData} />
         </div>
 
         {/* Suggestions Section (Below Content on Mobile, Side on Desktop) */}

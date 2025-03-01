@@ -16,7 +16,6 @@ const AuthOverlay = ({ onClose }) => {
     setIsLogin(!isLogin);
     setFormKey(Date.now()); // Reset form
   };
-
   const handleLoginSubmit = async (data) => {
     try {
       setLoading(true);
@@ -47,7 +46,8 @@ const AuthOverlay = ({ onClose }) => {
         }
       } catch (profileError) {
         // If profile fetch fails, check if it's a 404 (profile not found)
-        if (profileError.response?.status === 404) {
+        if (profileError.response?.status === 404 || 
+            profileError.response?.data?.error === "Profile does not exist") {
           navigate('/profile-creation');
           Notification("Please complete your profile creation", "success");
           return;
@@ -68,6 +68,7 @@ const AuthOverlay = ({ onClose }) => {
       setLoading(false);
     }
   };
+  
   
   
 

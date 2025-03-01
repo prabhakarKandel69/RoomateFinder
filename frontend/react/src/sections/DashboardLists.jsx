@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import { formatDistanceToNow } from "date-fns";
 
-const DashboardLists = () => {
+
+const DashboardLists = ({ userData }) => {
   const [matches, setMatches] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const navigate = useNavigate();
@@ -30,10 +32,11 @@ const DashboardLists = () => {
 
         // Map API response to recentActivities format
         const activities = response.data.map((activity) => ({
-          user: activity.user2_username,
+          user1: activity.user1_username,
           activity: activity.notification_action,
-          time: activity.time,
-          avatar: "https://via.placeholder.com/40", // Replace if avatar exists
+          time: formatDistanceToNow(new Date(activity.time), { addSuffix: true }),
+          user2: activity.user2_username,
+          
         }));
 
         setRecentActivities(activities);
@@ -68,9 +71,13 @@ const DashboardLists = () => {
                     className="w-10 h-10 rounded-full"
                   /> */}
                   <div>
-                    <p className="text-sm text-gray-700">
-                      <span className="font-semibold">{activity.user}</span> {activity.activity}
-                    </p>
+                  <p className="text-sm text-gray-700">
+                    <span className="font-semibold">{activity.user1}</span> {activity.activity}  
+                    <span className="font-semibold">
+                      {activity.user2.toLowerCase() === userData.first_name.toLowerCase() ? "you" : activity.user2}
+                    </span>
+                  </p>
+
                     <p className="text-xs text-gray-500">{activity.time}</p>
                   </div>
                 </li>
@@ -109,7 +116,7 @@ const DashboardLists = () => {
                   <Button
                     label="Message"
                     className="bg-secondary text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600"
-                    onClick={() => navigate(`/chat/${match.username}`)}
+                    onClick={() => navigate(`/messages`)}
                   />
                 </li>
               ))

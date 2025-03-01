@@ -16,7 +16,6 @@ const Profile = () => {
   const [isRequestLoading, setIsRequestLoading] = useState(false);
   const [apiUsername, setApiUsername] = useState(null); // Store API username
 
-
   // Fetch profile data and check if request was sent
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -46,8 +45,11 @@ const Profile = () => {
     setIsRequestLoading(true);
     try {
       await api.post('/matches/reqmatch/', { username });
+
       setIsRequestSent(true);
-      localStorage.setItem(`requestSent_${apiUsername}`, 'true'); // ✅ Store request status
+      const storedUsername = localStorage.getItem('username') || 'guest'; // Prevent null value
+      localStorage.setItem(`requestSent_${storedUsername}_${apiUsername}`, 'true');
+
       Notification('Request sent successfully!', 'success');
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Something went wrong!';
@@ -67,20 +69,20 @@ const Profile = () => {
       console.error('Error accepting request:', error);
       Notification('Failed to accept request.', 'error');
     } finally {
-      setIsRequestLoading(true);
+      setIsRequestLoading(false); // ✅ Fix: Set to false
     }
   };
 
   // Check localStorage to see if request was sent before
   useEffect(() => {
     if (apiUsername) {
-      const storedRequestStatus = localStorage.getItem(`requestSent_${apiUsername}`);
+      const storedUsername = localStorage.getItem('username') || 'guest';
+      const storedRequestStatus = localStorage.getItem(`requestSent_${storedUsername}_${apiUsername}`);
       if (storedRequestStatus === 'true') {
         setIsRequestSent(true);
       }
     }
   }, [apiUsername]); // ✅ Trigger when API username is available
-  
 
   if (loading) return <div className="text-center text-secondary">Loading...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
@@ -142,8 +144,17 @@ const Profile = () => {
               ) : (
                 <Button
                   className={`mt-2 bg-secondary text-white py-2 px-4 rounded-lg font-medium ${isRequestSent || isRequestLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-                  label={isRequestSent ? 'Sent' : 'Send Request'}
-                  icon={<Icon name="request" className="h-5 w-5" src="../../img/request.svg" />}
+                  label={isRequestLoading ? 'Sending...' : isRequestSent ? 'Sent' : 'Send Request'}
+                  icon={
+                    isRequestLoading ? (
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
+                      </svg>
+                    ) : (
+                      <Icon name="request" className="h-5 w-5" src="../../img/request.svg" />
+                    )
+                  }
                   onClick={!isRequestSent && !isRequestLoading ? sendRequest : null}
                   disabled={isRequestSent || isRequestLoading}
                 />

@@ -75,7 +75,12 @@ const Matches = () => {
             {loading && <p>Loading...</p>}
             {error && <p className="text-red-500">{error}</p>}
             {uniqueMatches.length > 0 ? (
-              <MatchesSection matches={uniqueMatches} onAccept={handleAccept} onReject={handleReject} />
+              <MatchesSection 
+                  matches={uniqueMatches} actives="Matches"
+                  active={true} 
+                  onAccept={handleAccept} 
+                  onReject={handleReject} 
+                />
             ) : (
               <p>No matches found.</p>
             )}

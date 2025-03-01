@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "../components/Card";
 
-const MatchesSection = ({ matches = [] }) => {
+const MatchesSection = ({ matches = [], actives }) => {
   return (
     <section className="py-12 bg-[#E7F8FD]">
       <div className="flex flex-wrap justify-center gap-4">
@@ -15,6 +15,7 @@ const MatchesSection = ({ matches = [] }) => {
               profile_pic={match.profile_pic}
               min_budget={match.min_budget}
               max_budget={match.max_budget}
+              active={actives}
             />
           ))
         ) : (

@@ -2,7 +2,7 @@ import React from "react";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 
-const Card = ({ username, address, profile_pic, min_budget, max_budget }) => {
+const Card = ({ username, address, profile_pic, min_budget, max_budget, active }) => {
   const navigate = useNavigate();
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden max-w-xs w-full sm:w-auto">
@@ -25,7 +25,7 @@ const Card = ({ username, address, profile_pic, min_budget, max_budget }) => {
         <Button 
           className="mt-4 bg-secondary text-white px-4 py-2 rounded-lg w-full"
           label="View Profile"
-          onClick={() => navigate(`/profile/${username}/search`)}
+          onClick={() => navigate(`/profile/${username}/${active}`)}
         />
       </div>
     </div>
