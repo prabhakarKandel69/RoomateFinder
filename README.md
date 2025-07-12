@@ -45,28 +45,33 @@ pip install -r requirements.txt
 
 ```
 
-## 🐍 Setup & Installation
-### Create virtual environment (optional)
-python -m venv env
 
-### Activate environment
+## 🚀 Running the Project
 
-On Windows
+### Prerequisites
+
+- Docker installed (for Redis)
+- Python environment set up (see Setup & Installation)
+- NPM(Node package manager)
+
+### Start Redis Server with Docker
 
 ```bash
-env\Scripts\activate
+docker pull redis
+docker run -p 6379:6379 redis
+```
+### ASGI server with Uvicorn (HTTP + WebSocket endpoint) runs on port 8000
+
+```bash
+python -m uvicorn RoommateFinder.asgi:application --host 0.0.0.0 --port 8000
 ```
 
-On Mac/Linux
+### Frontend - React
 
 ```bash
-source env/bin/activate
-```
-
-Install dependencies
-
-```bash
-pip install -r requirements.txt
+cd frontend/react
+npm install
+npm run
 ```
 
 ### 👨‍💻 Author
